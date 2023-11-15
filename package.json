@@ -3,12 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "a11y": "./scripts/a11y-sitemap-test",
+    "sitemap": "./scripts/retrieveSitemap"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.39.0",
     "@types/node": "^20.9.0"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.7.3"
   }
 }
