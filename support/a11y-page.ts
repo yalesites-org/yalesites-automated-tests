@@ -2,6 +2,45 @@ import { expect as baseExpect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import type { Result, NodeResult, AxeResults } from "axe-core";
 
+const violationOutput = {
+  outputViolations: (violations: Result[]) => {
+    return violations.map((violation) => violationOutput._outputViolation(violation)).join('\n');
+  },
+
+  _outputViolation: (violation: Result) => {
+    let { id, impact, description, nodes } = violation;
+
+    let message = "";
+
+    message += (`\n`);
+    message += (`--------------------------------------------------------------------------------\n`);
+    message += (`Violation: ${id} (${impact})\n`);
+    message += (`Description: ${description}\n`);
+    message += (`Affected nodes:\n`);
+    message += violationOutput._outputNodes(nodes);
+
+    return message;
+  },
+
+  _outputNodes: (nodes: NodeResult[]) => {
+    return nodes.map((node) => violationOutput._outputNode(node, 1)).join('\n');
+  },
+
+  _outputNode: (node: NodeResult, indention = 0) => {
+    let { html, target } = node;
+
+    let indentionString = "  ".repeat(indention);
+    let message = "";
+
+    message +=(`${indentionString}----------------------------------------\n`);
+    message +=(`${indentionString}${target}\n`);
+    message +=(`${indentionString}${html}\n`);
+    message +=(`${indentionString}${node.failureSummary}\n`);
+
+    return message;
+  },
+}
+
 export const expect = baseExpect.extend({
   async toBeAccessible(
     page: Page,
@@ -24,10 +63,7 @@ export const expect = baseExpect.extend({
     }
 
     const message = pass ? () => "True" : () => {
-      let message = `Violations for ${page.url()}\n`;
-      message += outputViolations(results.violations);
-
-      return message;
+      return violationOutput.outputViolations(results.violations);
     };
 
     return {
@@ -39,42 +75,6 @@ export const expect = baseExpect.extend({
     };
   },
 });
-
-const outputViolations = (violations: Result[]) => {
-  return violations.map((violation) => _outputViolation(violation)).join('\n');
-};
-
-const _outputViolation = (violation: Result) => {
-  let { id, impact, description, nodes } = violation;
-
-  let message = "";
-
-  message += (`\n`);
-  message += (`----------------------------------------\n`);
-  message += (`Violation: ${id} (${impact})\n`);
-  message += (`Description: ${description}\n`);
-  message += (`Affected nodes:\n`);
-  message += _outputNodes(nodes);
-
-  return message;
-};
-
-const _outputNodes = (nodes: NodeResult[]) => {
-  return nodes.map((node) => _outputNode(node)).join('\n');
-};
-
-const _outputNode = (node: NodeResult) => {
-  let { html, target } = node;
-
-  let message = "";
-
-  message +=(`  ----------------\n`);
-  message +=(`  ${target}\n`);
-  message +=(`  ${html}\n`);
-  message +=(`  ${node.failureSummary}\n`);
-
-  return message;
-};
 
 export class AxePage {
   private readonly axeBuilder: any;
