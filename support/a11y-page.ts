@@ -6,8 +6,12 @@ export class AxePage {
   private readonly axeBuilder: any
   public results: Result[] = []
 
-  constructor(public readonly page: Page) {
-    this.axeBuilder = new AxeBuilder({ page })
+  constructor(public readonly page: Page, public readonly options = { tags: [] }) {
+    let axeBuilder = new AxeBuilder({ page })
+    if (options.tags && options.tags.length > 0) {
+      axeBuilder.withTags(options.tags)
+    }
+    this.axeBuilder = axeBuilder
   }
 
   async evaluate() {
