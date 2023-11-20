@@ -1,5 +1,5 @@
-import { test as base, expect } from "@playwright/test";
-import { AxePage } from '@support/a11y-page';
+import { test as base } from "@playwright/test";
+import { expect, AxePage } from '@support/a11y-page';
 import fs from "fs";
 
 const axe_tags = [
@@ -30,6 +30,6 @@ const links = fs
 links.forEach((link: string) => {
   test(`Accessibility test for ${link}`, async ({ page, a11yPage }) => {
     await page.goto(link);
-    await a11yPage.evaluate();
+    await expect(page).toBeAccessible({ page, axe_tags });
   });
 });
