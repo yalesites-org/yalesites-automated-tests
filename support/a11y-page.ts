@@ -1,10 +1,10 @@
 import { expect, type Page } from '@playwright/test'
 import AxeBuilder from "@axe-core/playwright";
-import type { Result, NodeResult } from "axe-core";
+import type { Result, NodeResult, AxeResults } from "axe-core";
 
 export class AxePage {
   private readonly axeBuilder: any
-  public results: Result[] = []
+  public results: AxeResults
 
   constructor(public readonly page: Page, public readonly options = { tags: [] }) {
     let axeBuilder = new AxeBuilder({ page })
