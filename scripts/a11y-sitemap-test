@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 
-./scripts/retrieveSitemap "$1"
-playwright test ./tests/axe-sitemap.spec.ts
+if [ -z "$1" ] && [ -z "$YALESITES_SITE" ]
+  then
+    echo "Please provide a sitemap URL"
+    echo ""
+    echo "Usage: ./scripts/a11y-sitemap-test <sitemap-url>"
+    echo "or: npm run <cmd> -- <sitemap-url>"
+    echo "or: YALESITES_SITE=<site> npm run <cmd>"
+    exit 1
+fi
+./scripts/retrieveSitemap "$1" && playwright test ./tests/axe-sitemap.spec.ts

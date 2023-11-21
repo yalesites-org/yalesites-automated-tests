@@ -6,7 +6,8 @@ import * as fs from "fs";
  *
  * @param filename - The filename of the sitemap
  * @param encoding - The encoding of the sitemap (defaults to UTF-8)
- * @param filterCallback - A callback to filter the links (defaults to exclude empty lines)
+ * @param filterCallback - A callback to filter the links (defaults to exclude
+ *                         empty lines)
  *
  * @returns An array of links from the sitemap
  */
@@ -15,5 +16,13 @@ export default function getSitemapLinks(
   encoding: BufferEncoding = "utf-8",
   filterCallback: (link: string) => boolean = (link: string) => link !== "",
 ) {
-  return fs.readFileSync(filename, encoding).split("\n").filter(filterCallback);
+  try {
+    return fs
+      .readFileSync(filename, encoding)
+      .split("\n")
+      .filter(filterCallback);
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
