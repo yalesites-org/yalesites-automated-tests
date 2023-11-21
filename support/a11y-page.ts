@@ -42,7 +42,7 @@ const violationOutput = {
 }
 
 export const expect = baseExpect.extend({
-  async toBeAccessible(
+  async toPassAxe(
     page: Page,
     tags: Array<string>,
     options?: { timeout?: number },

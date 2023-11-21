@@ -1,5 +1,5 @@
-import { test as base } from "@playwright/test";
-import { expect, AxePage } from '@support/a11y-page';
+import { test } from "@playwright/test";
+import { expect } from '@support/a11y-page';
 import fs from "fs";
 
 const axe_tags = [
@@ -15,21 +15,14 @@ const axe_tags = [
   // "experimental",    // Cutting-edge rules
 ];
 
-export const test = base.extend<{ a11yPage: AxePage }>({
-  a11yPage: async ({ page }, use) => {
-    const a11y = new AxePage(page);
-    await use(a11y);
-  },
-});
-
 const links = fs
   .readFileSync("sitemap.links", "utf-8")
   .split("\n")
   .filter((link: string) => link !== "");
 
 links.forEach((link: string) => {
-  test(`Accessibility test for ${link}`, async ({ page, a11yPage }) => {
+  test(`Accessibility test for ${link}`, async ({ page }) => {
     await page.goto(link);
-    await expect(page).toBeAccessible({ page, axe_tags });
+    await expect(page).toPassAxe(axe_tags);
   });
 });
