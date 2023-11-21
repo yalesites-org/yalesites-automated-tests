@@ -2,9 +2,19 @@ import { expect as baseExpect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import type { Result, NodeResult, AxeResults } from "axe-core";
 
+/*
+ * Output axe result violations in a format that is easier to read.
+ *
+ * @param {Result[]} violations - An array of violations
+ *
+ * @returns {string} - A string with the violations formatted for output.
+ *
+ */
 const violationOutput = {
   outputViolations: (violations: Result[]) => {
-    return violations.map((violation) => violationOutput._outputViolation(violation)).join('\n');
+    return violations
+      .map((violation) => violationOutput._outputViolation(violation))
+      .join("\n");
   },
 
   _outputViolation: (violation: Result) => {
@@ -12,18 +22,18 @@ const violationOutput = {
 
     let message = "";
 
-    message += (`\n`);
-    message += (`--------------------------------------------------------------------------------\n`);
-    message += (`Violation: ${id} (${impact})\n`);
-    message += (`Description: ${description}\n`);
-    message += (`Affected nodes:\n`);
+    message += `\n`;
+    message += `--------------------------------------------------------------------------------\n`;
+    message += `Violation: ${id} (${impact})\n`;
+    message += `Description: ${description}\n`;
+    message += `Affected nodes:\n`;
     message += violationOutput._outputNodes(nodes);
 
     return message;
   },
 
   _outputNodes: (nodes: NodeResult[]) => {
-    return nodes.map((node) => violationOutput._outputNode(node, 1)).join('\n');
+    return nodes.map((node) => violationOutput._outputNode(node, 1)).join("\n");
   },
 
   _outputNode: (node: NodeResult, indention = 0) => {
@@ -32,15 +42,23 @@ const violationOutput = {
     let indentionString = "  ".repeat(indention);
     let message = "";
 
-    message +=(`${indentionString}----------------------------------------\n`);
-    message +=(`${indentionString}${target}\n`);
-    message +=(`${indentionString}${html}\n`);
-    message +=(`${indentionString}${node.failureSummary}\n`);
+    message += `${indentionString}----------------------------------------\n`;
+    message += `${indentionString}${target}\n`;
+    message += `${indentionString}${html}\n`;
+    message += `${indentionString}${node.failureSummary}\n`;
 
     return message;
   },
-}
+};
 
+/*
+ * Extend the expect object with a new matcher to check for accessibility.
+ *
+ * @param {Page} page - The page to test
+ * @param {string[]} tags - An array of axe tags to test against
+ *
+ * @returns {object} - An object with the pass/fail results of the test.
+ */
 export const expect = baseExpect.extend({
   async toPassAxe(
     page: Page,
@@ -62,9 +80,11 @@ export const expect = baseExpect.extend({
       matcherResult = e.matcherResult;
     }
 
-    const message = pass ? () => "True" : () => {
-      return violationOutput.outputViolations(results.violations);
-    };
+    const message = pass
+      ? () => "True"
+      : () => {
+          return violationOutput.outputViolations(results.violations);
+        };
 
     return {
       message,
@@ -76,6 +96,9 @@ export const expect = baseExpect.extend({
   },
 });
 
+/*
+ * A wrapper around axe-core/playwright to make it easier to use.
+ */
 export class AxePage {
   private readonly axeBuilder: any;
   public results: AxeResults;
@@ -85,9 +108,11 @@ export class AxePage {
     public readonly options = { tags: [] },
   ) {
     let axeBuilder = new AxeBuilder({ page });
+
     if (options.tags && options.tags.length > 0) {
       axeBuilder.withTags(options.tags);
     }
+
     this.axeBuilder = axeBuilder;
   }
 

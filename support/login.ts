@@ -3,6 +3,13 @@ import { execSync, type ExecSyncOptions } from "child_process";
 const LOCAL_CMD = "lando drush uli";
 const REMOTE_CMD = "terminus drush ~ -- user:login";
 
+/*
+ * Get the admin login URL for the site whether local or on lando.
+ * 
+ * @param {string} path - path to the yalesites-project directory.
+ * 
+ * @returns {string} - the login URL.
+ */
 export default function getLoginUrl(path: string) : string {
   let pathToUse = path;
   if (!path) {
