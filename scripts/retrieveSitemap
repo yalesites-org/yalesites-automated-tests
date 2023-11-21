@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# If $1 is missing, attempt to get the environment variable YALESITES_SITE
+if [ -z "$1" ]; then
+    if [ -z "$YALESITES_SITE" ]; then
+        echo "Usage: retrieveSitemap <site>"
+        echo "Or:    YALESITES_SITE=<site> retrieveSitemap"
+        exit 1
+    fi
+fi
+
+SITE=${1:-$YALESITES_SITE}
+curl --insecure "$SITE/sitemap.xml" 2>/dev/null | xmllint --xpath '//*[local-name()="loc"]/text()' --format - > sitemap.links
+
+if [ ! -f sitemap.links ]; then
+    echo "Could not retrieve sitemap.xml"
+    exit 1
+fi
+
+echo "Retrieved sitemap.links"
