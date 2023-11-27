@@ -64,6 +64,7 @@ export const expect = baseExpect.extend({
     page: Page,
     tags: Array<string>,
     options?: { timeout?: number },
+    outputBuffer: typeof violationOutput = violationOutput,
   ) {
     const axePage = new AxePage(page, { tags, ...options });
     let pass: boolean;
@@ -83,7 +84,7 @@ export const expect = baseExpect.extend({
     const message = pass
       ? () => "True"
       : () => {
-          return violationOutput.outputViolations(results.violations);
+          return outputBuffer.outputViolations(results.violations);
         };
 
     return {
