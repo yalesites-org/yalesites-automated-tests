@@ -6,6 +6,8 @@ import type { Result, NodeResult, AxeResults } from "axe-core";
  * Output axe result violations in a format that is easier to read.
  *
  * @param {Result[]} violations - An array of violations
+ * @param {integer} indentation - the number of 2 spaces to use as indention to
+ *                                output
  *
  * @returns {string} - A string with the violations formatted for output.
  *
