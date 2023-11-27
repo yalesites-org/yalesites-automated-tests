@@ -17,37 +17,40 @@ const violationOutput = {
       .join("\n");
   },
 
-  _outputViolation: (violation: Result) => {
+  _outputViolation: (violation: Result, indentation = 0) => {
     let { id, impact, description, nodes } = violation;
+    const indentedString = violationOutput.createIndentation(indentation);
 
-    let message = "";
-
-    message += `\n`;
-    message += `--------------------------------------------------------------------------------\n`;
-    message += `Violation: ${id} (${impact})\n`;
-    message += `Description: ${description}\n`;
-    message += `Affected nodes:\n`;
-    message += violationOutput._outputNodes(nodes);
-
-    return message;
+    return `
+${indentedString}--------------------------------------------------------------------------------
+${indentedString}Violation: ${id} (${impact})
+${indentedString}Description: ${description}
+${indentedString}Affected nodes:
+${indentedString}${violationOutput._outputNodes(nodes, indentation + 1)}
+    `;
   },
 
-  _outputNodes: (nodes: NodeResult[]) => {
-    return nodes.map((node) => violationOutput._outputNode(node, 1)).join("\n");
+  _outputNodes: (nodes: NodeResult[], indentation = 0) => {
+    return Array.from(nodes, (node) =>
+      violationOutput._outputNode(node, indentation),
+    ).join("\n");
   },
 
   _outputNode: (node: NodeResult, indention = 0) => {
     let { html, target } = node;
 
     let indentionString = "  ".repeat(indention);
-    let message = "";
 
-    message += `${indentionString}----------------------------------------\n`;
-    message += `${indentionString}${target}\n`;
-    message += `${indentionString}${html}\n`;
-    message += `${indentionString}${node.failureSummary}\n`;
+    return `
+${indentionString}----------------------------------------
+${indentionString}${target}
+${indentionString}${html}
 
-    return message;
+${indentionString}${node.failureSummary}
+    `;
+  },
+  createIndentation(indention: number) {
+    return "  ".repeat(indention);
   },
 };
 
@@ -62,11 +65,18 @@ const violationOutput = {
 export const expect = baseExpect.extend({
   async toPassAxe(
     page: Page,
-    tags: Array<string>,
-    options?: { timeout?: number },
-    outputBuffer: typeof violationOutput = violationOutput,
+    options: {
+      tags: Array<string>;
+      options?: { timeout?: number };
+      outputBuffer?: typeof violationOutput;
+    },
   ) {
-    const axePage = new AxePage(page, { tags, ...options });
+    if (!options.outputBuffer) {
+      options.outputBuffer = violationOutput;
+    }
+
+    const { tags, options: axePageOptions, outputBuffer } = options;
+    const axePage = new AxePage(page, { tags, ...axePageOptions });
     let pass: boolean;
     let matcherResult: any;
     const expected = 0;
@@ -101,12 +111,12 @@ export const expect = baseExpect.extend({
  * A wrapper around axe-core/playwright to make it easier to use.
  */
 export class AxePage {
-  private readonly axeBuilder: any;
+  private readonly axeBuilder: AxeBuilder;
   public results: AxeResults;
 
   constructor(
     public readonly page: Page,
-    public readonly options = { tags: [] },
+    public readonly options = { tags: [] as string[] },
   ) {
     let axeBuilder = new AxeBuilder({ page });
 
@@ -117,7 +127,7 @@ export class AxePage {
     this.axeBuilder = axeBuilder;
   }
 
-  async evaluate() {
+  async evaluate(): Promise<AxeResults> {
     this.results = await this.axeBuilder.analyze();
     return this.results;
   }
