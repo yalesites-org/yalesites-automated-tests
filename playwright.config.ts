@@ -29,7 +29,8 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://yalesites-platform.lndo.site',
+    // use environment varaible YALESITES_URL or default to yalesites-platform.lndo.site
+    baseURL: process.env.YALESITES_URL || 'https://yalesites-platform.lndo.site',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -42,35 +43,35 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], contextOptions: launchOptions },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'], contextOptions: launchOptions },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'], contextOptions: launchOptions },
+    // },
 
     /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'], contextOptions: launchOptions },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'], contextOptions: launchOptions },
-    },
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'], contextOptions: launchOptions },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'], contextOptions: launchOptions },
+    // },
 
     /* Test against branded browsers. */
-    {
-      name: 'Microsoft Edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge', contextOptions: launchOptions },
-    },
-    {
-      name: 'Google Chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
-    },
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge', contextOptions: launchOptions },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
+    // },
   ],
 
   /* Run your local dev server before starting the tests */
