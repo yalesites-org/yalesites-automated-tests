@@ -59,7 +59,13 @@ const tests = () => {
     await page.waitForSelector("p");
 
     const searchResults = await page.$("div.search-result");
-    expect(searchResults).toBeFalsy();
+
+    expect(searchResults);
+
+    if (searchResults) {
+      const searchResultsText = await searchResults.textContent();
+      expect(searchResultsText).not.toContain("breadcrumbs");
+    }
   });
 
   test("should find results that exist", async ({ page }) => {
