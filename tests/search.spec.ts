@@ -42,7 +42,7 @@ const tests = () => {
   test("should result in no matches if there are none", async ({ page }) => {
     const search = await page.$(await getSearchId(page));
 
-    await search?.fill("blah");
+    await search?.fill("somethingthatshouldneverexist");
     await search?.press("Enter");
 
     await page.waitForSelector("p");
