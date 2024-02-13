@@ -1,7 +1,7 @@
-import { test, expect, type Page, type ElementHandle } from "@playwright/test";
+import { test, expect, type Page} from "@playwright/test";
+import { type InputType, selectElement } from "@support/a11ySelectElement";
 import { AxeBuilder } from "@axe-core/playwright";
 
-type InputType = "mouse" | "keyboard";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/component-pages-for-e2e-testing/accordion");
@@ -101,20 +101,3 @@ const toggleAllAccordions = async (
   await selectElement(page, expandAllButton, inputType);
 };
 
-const selectElement = async (
-  page: Page,
-  element: ElementHandle,
-  inputType: InputType,
-): Promise<void> => {
-  expect(inputType).toMatch(/mouse|keyboard/);
-
-  switch (inputType) {
-    case "mouse":
-      await element?.click();
-      break;
-    case "keyboard":
-      await element?.focus();
-      await page.keyboard.press("Enter");
-      break;
-  }
-};
