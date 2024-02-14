@@ -1,7 +1,34 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, ElementHandle } from "@playwright/test";
 import { selectElement, type InputType } from "@support/a11ySelectElement";
 import a11yTests from "@support/a11yTests";
 import visRegTests from "@support/visRegTests";
+
+const FIRST_ACCORDION_TAB_COUNT = 19;
+
+const toggleExpandCollapseAll = async (
+  page: Page,
+  inputType: InputType,
+): Promise<void> => {
+  const expandAllButton = await page.$(".accordion__toggle-all");
+
+  await selectElement(page, expandAllButton, inputType);
+};
+
+const toggleAccordionsIndividually = async (
+  page: Page,
+  accordionButtons: ElementHandle<SVGElement | HTMLElement>[],
+  inputType: InputType,
+): Promise<void> => {
+  for (const item of accordionButtons) {
+    await selectElement(page, item, inputType);
+  }
+}
+
+const checkAccordionState = async (accordionButtons, expectedState) => {
+  for (const item of accordionButtons) {
+    expect(await item.getAttribute("aria-expanded")).toBe(expectedState);
+  }
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/component-pages-for-e2e-testing/accordion");
@@ -11,39 +38,28 @@ const tests = (inputType: InputType) => {
   test("should open and close", async ({ page }) => {
     const accordionButtons = await page.$$(".accordion-item__toggle");
 
-    for (const item of accordionButtons) {
-      await selectElement(page, item, inputType);
-      expect(await item.getAttribute("aria-expanded")).toBe("true");
-    }
+    await toggleAccordionsIndividually(page, accordionButtons, inputType);
+    await checkAccordionState(accordionButtons, "true");
 
-    for (const item of accordionButtons) {
-      await selectElement(page, item, inputType);
-      expect(await item.getAttribute("aria-expanded")).toBe("false");
-    }
+    await toggleAccordionsIndividually(page, accordionButtons, inputType);
+    await checkAccordionState(accordionButtons, "false");
   });
 
   test("Expand All should open all accordions", async ({ page }) => {
-    await toggleAllAccordions(page, inputType);
+    await toggleExpandCollapseAll(page, inputType);
     const accordionButtons = await page.$$(".accordion-item__toggle");
-
-    for (const item of accordionButtons) {
-      expect(await item.getAttribute("aria-expanded")).toBe("true");
-    }
+    await checkAccordionState(accordionButtons, "true");
   });
 
   test("Collapse All should close all accordions", async ({ page }) => {
     // First open them all.
-    await toggleAllAccordions(page, inputType);
+    await toggleExpandCollapseAll(page, inputType);
     const accordionButtons = await page.$$(".accordion-item__toggle");
-    for (const item of accordionButtons) {
-      expect(await item.getAttribute("aria-expanded")).toBe("true");
-    }
+    await checkAccordionState(accordionButtons, "true");
 
     // Now close them all
-    await toggleAllAccordions(page, inputType);
-    for (const item of accordionButtons) {
-      expect(await item.getAttribute("aria-expanded")).toBe("false");
-    }
+    await toggleExpandCollapseAll(page, inputType);
+    await checkAccordionState(accordionButtons, "false");
   });
 
   test("If some accordions are open, ensure that the toggle button is set to Expand All", async ({
@@ -77,6 +93,14 @@ test.describe("Desktop", () => {
 
   test.describe("with keyboard", () => {
     tests("keyboard");
+
+    test("can tab to the first accordion", async ({ page }) => {
+      const firstAccordion = page.locator(".accordion-item__toggle").first();
+      for (let i = 0; i < FIRST_ACCORDION_TAB_COUNT; i++) {
+        await page.keyboard.press("Tab");
+      }
+      await expect(firstAccordion).toBeFocused();
+    });
   });
 
   a11yTests();
@@ -99,13 +123,3 @@ test.describe("Mobile", () => {
   a11yTests();
   visRegTests();
 });
-
-// Since this isn't the point of the tests, we extract this into a helper function.
-const toggleAllAccordions = async (
-  page: Page,
-  inputType: InputType,
-): Promise<void> => {
-  const expandAllButton = await page.$(".accordion__toggle-all");
-
-  await selectElement(page, expandAllButton, inputType);
-};
