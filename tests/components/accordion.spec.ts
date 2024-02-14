@@ -1,7 +1,7 @@
-import { test, expect, type Page} from "@playwright/test";
-import { type InputType, selectElement } from "@support/a11ySelectElement";
-import { AxeBuilder } from "@axe-core/playwright";
-
+import { expect, test, type Page } from "@playwright/test";
+import { selectElement, type InputType } from "@support/a11ySelectElement";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/component-pages-for-e2e-testing/accordion");
@@ -70,28 +70,37 @@ const tests = (inputType: InputType) => {
   });
 };
 
-test.describe("with mouse", () => {
-  tests("mouse");
-});
-
-test.describe("with keyboard", () => {
-  tests("keyboard");
-});
-
-test.describe("accessibility", () => {
-  test("should pass axe", async ({ page }) => {
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-    expect(accessibilityScanResults.violations).toEqual([]);
+test.describe("Desktop", () => {
+  test.describe("with mouse", () => {
+    tests("mouse");
   });
-});
 
-test.describe("visual regression", () => {
-  test("should match previous screenshot", async ({ page }) => {
-    const screenshot = await page.screenshot();
-    expect(screenshot).toMatchSnapshot();
+  test.describe("with keyboard", () => {
+    tests("keyboard");
   });
+
+  a11yTests();
+  visRegTests();
 });
 
+test.describe("Mobile", () => {
+  test.beforeEach(async ({ page }) => {
+    page.setViewportSize({ width: 375, height: 812 });
+  });
+
+  test.describe("with mouse", () => {
+    tests("mouse");
+  });
+
+  test.describe("with keyboard", () => {
+    tests("keyboard");
+  });
+
+  a11yTests();
+  visRegTests();
+});
+
+// Since this isn't the point of the tests, we extract this into a helper function.
 const toggleAllAccordions = async (
   page: Page,
   inputType: InputType,
@@ -100,4 +109,3 @@ const toggleAllAccordions = async (
 
   await selectElement(page, expandAllButton, inputType);
 };
-
