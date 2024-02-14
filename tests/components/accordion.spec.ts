@@ -1,8 +1,7 @@
-import { expect, test, type Page, ElementHandle } from "@playwright/test";
+import { test, type Page, ElementHandle } from "@playwright/test";
 import { selectElement, type InputType } from "support/a11ySelectElement";
-import a11yTests from "support/a11yTests";
-import visRegTests from "@support/visRegTests";
 import tabKeyForBrowser from "support/tabKey";
+import { expect } from "@support/axePage";
 
 const toggleExpandCollapseAll = async (
   page: Page,
@@ -21,13 +20,13 @@ const toggleAccordionsIndividually = async (
   for (const item of accordionButtons) {
     await selectElement(page, item, inputType);
   }
-}
+};
 
 const checkAccordionState = async (accordionButtons, expectedState) => {
   for (const item of accordionButtons) {
     expect(await item.getAttribute("aria-expanded")).toBe(expectedState);
   }
-}
+};
 
 let tabKey: string;
 test.beforeEach(async ({ page, defaultBrowserType }) => {
@@ -39,94 +38,104 @@ test.beforeEach(async ({ page, defaultBrowserType }) => {
 });
 
 const tests = (inputType: InputType) => {
-  test("should open and close", async ({ page }) => {
-    const accordionButtons = await page.$$(".accordion-item__toggle");
+  test.describe("common tests", () => {
+    test("should open and close", async ({ page }) => {
+      const accordionButtons = await page.$$(".accordion-item__toggle");
 
-    await toggleAccordionsIndividually(page, accordionButtons, inputType);
-    await checkAccordionState(accordionButtons, "true");
+      await toggleAccordionsIndividually(page, accordionButtons, inputType);
+      await checkAccordionState(accordionButtons, "true");
 
-    await toggleAccordionsIndividually(page, accordionButtons, inputType);
-    await checkAccordionState(accordionButtons, "false");
-  });
+      await toggleAccordionsIndividually(page, accordionButtons, inputType);
+      await checkAccordionState(accordionButtons, "false");
+    });
 
-  test("Expand All should open all accordions", async ({ page }) => {
-    await toggleExpandCollapseAll(page, inputType);
-    const accordionButtons = await page.$$(".accordion-item__toggle");
-    await checkAccordionState(accordionButtons, "true");
-  });
+    test("Expand All should open all accordions", async ({ page }) => {
+      await toggleExpandCollapseAll(page, inputType);
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionState(accordionButtons, "true");
+    });
 
-  test("Collapse All should close all accordions", async ({ page }) => {
-    // First open them all.
-    await toggleExpandCollapseAll(page, inputType);
-    const accordionButtons = await page.$$(".accordion-item__toggle");
-    await checkAccordionState(accordionButtons, "true");
+    test("Collapse All should close all accordions", async ({ page }) => {
+      // First open them all.
+      await toggleExpandCollapseAll(page, inputType);
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionState(accordionButtons, "true");
 
-    // Now close them all
-    await toggleExpandCollapseAll(page, inputType);
-    await checkAccordionState(accordionButtons, "false");
-  });
+      // Now close them all
+      await toggleExpandCollapseAll(page, inputType);
+      await checkAccordionState(accordionButtons, "false");
+    });
 
-  test("If some accordions are open, ensure that the toggle button is set to Expand All", async ({
-    page,
-  }) => {
-    const accordionButtons = await page.$$(".accordion-item__toggle");
-    const firstAccordion = accordionButtons[0];
-    await selectElement(page, firstAccordion, inputType);
-    const expandAllButton = await page.$(".accordion__toggle-all");
+    test("if some accordions are open, ensure that the toggle button is set to Expand All", async ({
+      page,
+    }) => {
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      const firstAccordion = accordionButtons[0];
+      await selectElement(page, firstAccordion, inputType);
+      const expandAllButton = await page.$(".accordion__toggle-all");
 
-    expect(await expandAllButton?.innerText()).toBe("Expand All");
-  });
+      expect(await expandAllButton?.innerText()).toBe("Expand All");
+    });
 
-  test("If all accordions are manually expanded, ensure that the toggle button is set to Collapse All", async ({
-    page,
-  }) => {
-    const accordionButtons = await page.$$(".accordion-item__toggle");
-    for (const item of accordionButtons) {
-      await selectElement(page, item, inputType);
-    }
-    const collapseAllButton = await page.$(".accordion__toggle-all");
+    test("if all accordions are manually expanded, ensure that the toggle button is set to Collapse All", async ({
+      page,
+    }) => {
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      for (const item of accordionButtons) {
+        await selectElement(page, item, inputType);
+      }
+      const collapseAllButton = await page.$(".accordion__toggle-all");
 
-    expect(await collapseAllButton?.innerText()).toBe("Collapse All");
-  });
+      expect(await collapseAllButton?.innerText()).toBe("Collapse All");
+    });
 
-  test("First accordion title is displayed", async ({ page }) => {
-    const firstAccordionTitle = await page.$(".accordion-item__heading");
-    expect(firstAccordionTitle).not.toBeNull();
-  });
+    test("first accordion title is displayed", async ({ page }) => {
+      const firstAccordionTitle = await page.$(".accordion-item__heading");
+      expect(firstAccordionTitle).not.toBeNull();
+    });
 
-  test("First accordion content is displayed when expanded", async ({ page }) => {
-    const firstAccordion = page.locator(".accordion-item").first();
-    await selectElement(page, await firstAccordion.locator(".accordion-item__toggle").elementHandle(), inputType);
+    test("first accordion content is displayed when expanded", async ({
+      page,
+    }) => {
+      const firstAccordion = page.locator(".accordion-item").first();
+      await selectElement(
+        page,
+        await firstAccordion.locator(".accordion-item__toggle").elementHandle(),
+        inputType,
+      );
 
-    const firstAccordionContent = firstAccordion.locator(".accordion-item__content").first();
-    expect(firstAccordionContent).not.toBeNull();
-    await page.waitForTimeout(500);
-    expect(firstAccordionContent).toBeVisible();
-    const content = await firstAccordionContent.innerText();
-    expect(content.length).toBeGreaterThan(0);
-  });
-};
+      const firstAccordionContent = firstAccordion
+        .locator(".accordion-item__content")
+        .first();
+      expect(firstAccordionContent).not.toBeNull();
+      await page.waitForTimeout(500);
+      expect(firstAccordionContent).toBeVisible();
+      const content = await firstAccordionContent.innerText();
+      expect(content.length).toBeGreaterThan(0);
+    });
 
-test.describe("Desktop", () => {
-  test.describe("with mouse", () => {
-    tests("mouse");
-  });
-
-  test.describe("with keyboard", () => {
-    tests("keyboard");
-
-    test("can tab to the first accordion", async ({ page, browserName, isMobile }) => {
+    test("can tab to the first accordion", async ({
+      page,
+      browserName,
+      isMobile,
+    }) => {
       const tabCountToGetToFirstAccordion = {
         firefox: {
           mobile: 7,
           desktop: 7,
         },
+        webkit: {
+          mobile: 8,
+        },
+        chromium: {
+          mobile: 8,
+        },
         default: 19,
-      }
+      };
       const browserType = isMobile ? "mobile" : "desktop";
 
-      const firstAccordionTabCount = tabCountToGetToFirstAccordion[browserName]?.[browserType] ||
-        tabCountToGetToFirstAccordion[browserName] ||
+      const firstAccordionTabCount =
+        tabCountToGetToFirstAccordion[browserName]?.[browserType] ||
         tabCountToGetToFirstAccordion.default;
       const firstAccordion = page.locator(".accordion-item__toggle").first();
       expect(firstAccordion).not.toBeFocused();
@@ -146,24 +155,31 @@ test.describe("Desktop", () => {
       await expect(skipLink).toHaveText("Skip to main content");
     });
   });
+};
 
-  a11yTests();
-  visRegTests();
+test.describe("with mouse", () => {
+  tests("mouse");
 });
 
-test.describe("Mobile", () => {
-  test.beforeEach(async ({ page }) => {
-    page.setViewportSize({ width: 375, height: 812 });
-  });
+test.describe("with keyboard", () => {
+  tests("keyboard");
+});
 
-  test.describe("with mouse", () => {
-    tests("mouse");
+test.describe("visual regression", () => {
+  test("should match previous screenshot", async ({ page }) => {
+    await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
   });
+});
 
-  test.describe("with keyboard", () => {
-    tests("keyboard");
+const axe_tags = [
+  "wcag2a",
+  "wcag2aa",
+  "wcag21a",
+  "wcag21aa",
+  "best-practice",
+]
+test.describe("accessibility", () => {
+  test("should pass axe", async ({ page }) => {
+    await expect(page).toPassAxe({ tags: axe_tags });
   });
-
-  a11yTests();
-  visRegTests();
 });

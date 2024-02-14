@@ -48,20 +48,20 @@ export default defineConfig({
     //   use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
     // },
 
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'], contextOptions: launchOptions },
-    // },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'], contextOptions: launchOptions },
+    },
 
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
     //   use: { ...devices['Pixel 5'], contextOptions: launchOptions },
     // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'], contextOptions: launchOptions },
-    // },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'], contextOptions: launchOptions },
+    },
 
     /* Test against branded browsers. */
     // {
