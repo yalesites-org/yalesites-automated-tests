@@ -1,7 +1,8 @@
-import { test, type Page, ElementHandle } from "@playwright/test";
+import { expect, test, type Page, ElementHandle } from "@playwright/test";
 import { selectElement, type InputType } from "support/a11ySelectElement";
 import tabKeyForBrowser from "support/tabKey";
-import { expect } from "@support/axePage";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 const toggleExpandCollapseAll = async (
   page: Page,
@@ -22,7 +23,10 @@ const toggleAccordionsIndividually = async (
   }
 };
 
-const checkAccordionState = async (accordionButtons, expectedState) => {
+const checkAccordionAriaExpandedState = async (
+  accordionButtons: ElementHandle[],
+  expectedState: string,
+) => {
   for (const item of accordionButtons) {
     expect(await item.getAttribute("aria-expanded")).toBe(expectedState);
   }
@@ -33,7 +37,7 @@ test.beforeEach(async ({ page, defaultBrowserType }) => {
   // Webkit uses Alt+Tab over Tab to traverse, so we capture this before a test is done.
   tabKey = tabKeyForBrowser(defaultBrowserType);
   await page.goto("/component-pages-for-e2e-testing/accordion");
-  await page.waitForLoadState("domcontentloaded");
+  await page.waitForLoadState("load");
   page.locator("body");
 });
 
@@ -43,27 +47,27 @@ const tests = (inputType: InputType) => {
       const accordionButtons = await page.$$(".accordion-item__toggle");
 
       await toggleAccordionsIndividually(page, accordionButtons, inputType);
-      await checkAccordionState(accordionButtons, "true");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
 
       await toggleAccordionsIndividually(page, accordionButtons, inputType);
-      await checkAccordionState(accordionButtons, "false");
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
     });
 
     test("Expand All should open all accordions", async ({ page }) => {
       await toggleExpandCollapseAll(page, inputType);
       const accordionButtons = await page.$$(".accordion-item__toggle");
-      await checkAccordionState(accordionButtons, "true");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
     });
 
     test("Collapse All should close all accordions", async ({ page }) => {
       // First open them all.
       await toggleExpandCollapseAll(page, inputType);
       const accordionButtons = await page.$$(".accordion-item__toggle");
-      await checkAccordionState(accordionButtons, "true");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
 
       // Now close them all
       await toggleExpandCollapseAll(page, inputType);
-      await checkAccordionState(accordionButtons, "false");
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
     });
 
     test("if some accordions are open, ensure that the toggle button is set to Expand All", async ({
@@ -113,47 +117,6 @@ const tests = (inputType: InputType) => {
       const content = await firstAccordionContent.innerText();
       expect(content.length).toBeGreaterThan(0);
     });
-
-    test("can tab to the first accordion", async ({
-      page,
-      browserName,
-      isMobile,
-    }) => {
-      const tabCountToGetToFirstAccordion = {
-        firefox: {
-          mobile: 7,
-          desktop: 7,
-        },
-        webkit: {
-          mobile: 8,
-        },
-        chromium: {
-          mobile: 8,
-        },
-        default: 19,
-      };
-      const browserType = isMobile ? "mobile" : "desktop";
-
-      const firstAccordionTabCount =
-        tabCountToGetToFirstAccordion[browserName]?.[browserType] ||
-        tabCountToGetToFirstAccordion.default;
-      const firstAccordion = page.locator(".accordion-item__toggle").first();
-      expect(firstAccordion).not.toBeFocused();
-      for (let i = 0; i < firstAccordionTabCount; i++) {
-        await page.keyboard.press(tabKey);
-      }
-      await expect(firstAccordion).toBeFocused();
-    });
-
-    test("can skip to main content", async ({ page, browserName }) => {
-      if (browserName === "firefox") {
-        return;
-      }
-      await page.keyboard.press(tabKey);
-      const skipLink = page.locator("a[href='#main-content']");
-      await expect(skipLink).toBeFocused();
-      await expect(skipLink).toHaveText("Skip to main content");
-    });
   });
 };
 
@@ -163,23 +126,53 @@ test.describe("with mouse", () => {
 
 test.describe("with keyboard", () => {
   tests("keyboard");
-});
 
-test.describe("visual regression", () => {
-  test("should match previous screenshot", async ({ page }) => {
-    await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
+  test("can tab to the first accordion", async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
+    // The animation of the menu seems to be affecting tabbing to the first accordion.
+    // We wait for a bit to ensure the animation is done.
+    await page.waitForTimeout(500);
+    const tabCountToGetToFirstAccordion = {
+      firefox: {
+        mobile: 7,
+        desktop: 7,
+      },
+      webkit: {
+        mobile: 8,
+      },
+      chromium: {
+        mobile: 8,
+      },
+      default: 19,
+    };
+    const browserType = isMobile ? "mobile" : "desktop";
+
+    const firstAccordionTabCount =
+      tabCountToGetToFirstAccordion[browserName]?.[browserType] ||
+      tabCountToGetToFirstAccordion.default;
+    const firstAccordionItem = page.locator(".accordion-item__toggle").first();
+    expect(firstAccordionItem).not.toBeFocused();
+    for (let i = 0; i < firstAccordionTabCount; i++) {
+      await page.keyboard.press(tabKey);
+    }
+    await expect(firstAccordionItem).toBeFocused();
+  });
+
+  test("can skip to main content", async ({ page, browserName }) => {
+    // Firefox can't target skip to main?  WHy?!?
+    if (browserName === "firefox") {
+      return;
+    }
+    await page.keyboard.press(tabKey);
+    const skipLink = page.locator("a[href='#main-content']");
+    await expect(skipLink).toBeFocused();
+    await expect(skipLink).toHaveText("Skip to main content");
   });
 });
 
-const axe_tags = [
-  "wcag2a",
-  "wcag2aa",
-  "wcag21a",
-  "wcag21aa",
-  "best-practice",
-]
-test.describe("accessibility", () => {
-  test("should pass axe", async ({ page }) => {
-    await expect(page).toPassAxe({ tags: axe_tags });
-  });
-});
+visRegTests();
+
+a11yTests();

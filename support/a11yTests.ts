@@ -1,11 +1,10 @@
-import { AxeBuilder } from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
+import { expect } from "@support/axePage";
 
-export default function a11yTests() {
+export default async function a11yTests(axe_tags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"]) {
     test.describe("accessibility", () => {
         test("should pass axe", async ({ page }) => {
-            const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-            expect(accessibilityScanResults.violations).toEqual([]);
+            await expect(page).toPassAxe({ tags: axe_tags });
         });
     });
 }

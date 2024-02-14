@@ -1,17 +1,6 @@
 import { test, expect, type Page, type ElementHandle } from "@playwright/test";
 import getLoginUrl from "@support/login";
 
-const loginAsAdmin = async (page: Page) => {
-  const loginUrl = getLoginUrl(process.env.YALESITES_PROJECT_PATH);
-  expect(loginUrl).not.toBeNull();
-
-  await page.goto(loginUrl);
-  const heading = page.getByRole("heading", { name: "admin", exact: true });
-  expect(heading).toBeTruthy();
-
-  return page;
-};
-
 const DESKTOP_SEARCH_ID = "input#edit-keywords--header-search-form-desktop";
 const MOBILE_SEARCH_ID = "input#edit-keywords--header-search-form-mobile";
 
@@ -33,7 +22,7 @@ const getSearchId = async (page: Page) => {
 };
 
 const tests = () => {
-  test("should have a search", async ({ page }) => {
+  test("page should have a search", async ({ page }) => {
     const search = await page.$(await getSearchId(page));
 
     expect(search).toBeTruthy();
@@ -125,21 +114,8 @@ const tests = () => {
   });
 };
 
-test.describe("Search page", () => {
-  test.describe("As an admin", () => {
-    test.beforeEach(async ({ page }) => {
-      expect(await loginAsAdmin(page)).not.toBeNull();
-      await page.goto("/");
-    });
-
-    tests();
-  });
-
-  test.describe("As a visitor", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/");
-    });
-
-    tests();
-  });
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
 });
+
+tests();

@@ -43,10 +43,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], contextOptions: launchOptions },
     },
 
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
-    // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
+    },
 
     {
       name: 'webkit',
@@ -60,7 +60,7 @@ export default defineConfig({
     // },
     {
       name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'], contextOptions: launchOptions },
+      use: { ...devices['iPhone 13 Mini'], contextOptions: launchOptions },
     },
 
     /* Test against branded browsers. */
