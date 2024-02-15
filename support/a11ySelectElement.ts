@@ -6,6 +6,7 @@ export const selectElement = async (
   page: Page,
   element: ElementHandle,
   inputType: InputType,
+  key: string = "Enter",
 ): Promise<void> => {
   expect(inputType).toMatch(/mouse|keyboard/);
 
@@ -15,8 +16,7 @@ export const selectElement = async (
       break;
     case "keyboard":
       await element?.focus();
-      await page.keyboard.press("Enter");
+      await page.keyboard.press(key);
       break;
   }
 };
-

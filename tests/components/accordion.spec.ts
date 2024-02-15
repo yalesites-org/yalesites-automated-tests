@@ -7,19 +7,21 @@ import visRegTests from "@support/visRegTests";
 const toggleExpandCollapseAll = async (
   page: Page,
   inputType: InputType,
+  key: string = "Enter",
 ): Promise<void> => {
   const expandAllButton = await page.$(".accordion__toggle-all");
 
-  await selectElement(page, expandAllButton, inputType);
+  await selectElement(page, expandAllButton, inputType, key);
 };
 
 const toggleAccordionsIndividually = async (
   page: Page,
   accordionButtons: ElementHandle<SVGElement | HTMLElement>[],
   inputType: InputType,
+  key: string = "Enter",
 ): Promise<void> => {
   for (const item of accordionButtons) {
-    await selectElement(page, item, inputType);
+    await selectElement(page, item, inputType, key);
   }
 };
 
@@ -43,33 +45,6 @@ test.beforeEach(async ({ page, defaultBrowserType }) => {
 
 const tests = (inputType: InputType) => {
   test.describe("common tests", () => {
-    test("should open and close", async ({ page }) => {
-      const accordionButtons = await page.$$(".accordion-item__toggle");
-
-      await toggleAccordionsIndividually(page, accordionButtons, inputType);
-      await checkAccordionAriaExpandedState(accordionButtons, "true");
-
-      await toggleAccordionsIndividually(page, accordionButtons, inputType);
-      await checkAccordionAriaExpandedState(accordionButtons, "false");
-    });
-
-    test("Expand All should open all accordions", async ({ page }) => {
-      await toggleExpandCollapseAll(page, inputType);
-      const accordionButtons = await page.$$(".accordion-item__toggle");
-      await checkAccordionAriaExpandedState(accordionButtons, "true");
-    });
-
-    test("Collapse All should close all accordions", async ({ page }) => {
-      // First open them all.
-      await toggleExpandCollapseAll(page, inputType);
-      const accordionButtons = await page.$$(".accordion-item__toggle");
-      await checkAccordionAriaExpandedState(accordionButtons, "true");
-
-      // Now close them all
-      await toggleExpandCollapseAll(page, inputType);
-      await checkAccordionAriaExpandedState(accordionButtons, "false");
-    });
-
     test("if some accordions are open, ensure that the toggle button is set to Expand All", async ({
       page,
     }) => {
@@ -122,6 +97,23 @@ const tests = (inputType: InputType) => {
 
 test.describe("with mouse", () => {
   tests("mouse");
+
+  test("Expand All should open all accordions", async ({ page }) => {
+    await toggleExpandCollapseAll(page, "mouse");
+    const accordionButtons = await page.$$(".accordion-item__toggle");
+    await checkAccordionAriaExpandedState(accordionButtons, "true");
+  });
+
+  test("Collapse All should close all accordions", async ({ page }) => {
+    // First open them all.
+    await toggleExpandCollapseAll(page, "mouse");
+    const accordionButtons = await page.$$(".accordion-item__toggle");
+    await checkAccordionAriaExpandedState(accordionButtons, "true");
+
+    // Now close them all
+    await toggleExpandCollapseAll(page, "mouse");
+    await checkAccordionAriaExpandedState(accordionButtons, "false");
+  });
 });
 
 test.describe("with keyboard", () => {
@@ -170,6 +162,84 @@ test.describe("with keyboard", () => {
     const skipLink = page.locator("a[href='#main-content']");
     await expect(skipLink).toBeFocused();
     await expect(skipLink).toHaveText("Skip to main content");
+  });
+
+  test.describe("with ENTER key", () => {
+    test("should open and close", async ({ page }) => {
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+
+      await toggleAccordionsIndividually(
+        page,
+        accordionButtons,
+        "keyboard",
+        "Enter",
+      );
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+
+      await toggleAccordionsIndividually(
+        page,
+        accordionButtons,
+        "keyboard",
+        "Enter",
+      );
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
+    });
+
+    test("Expand All should open all accordions", async ({ page }) => {
+      await toggleExpandCollapseAll(page, "keyboard");
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+    });
+
+    test("Collapse All should close all accordions", async ({ page }) => {
+      // First open them all.
+      await toggleExpandCollapseAll(page, "keyboard", "Enter");
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+
+      // Now close them all
+      await toggleExpandCollapseAll(page, "keyboard", "Enter");
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
+    });
+  });
+
+  test.describe("with SPACE key", () => {
+    test("should open and close", async ({ page }) => {
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+
+      await toggleAccordionsIndividually(
+        page,
+        accordionButtons,
+        "keyboard",
+        "Space",
+      );
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+
+      await toggleAccordionsIndividually(
+        page,
+        accordionButtons,
+        "keyboard",
+        "Space",
+      );
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
+    });
+
+    test("Expand All should open all accordions", async ({ page }) => {
+      await toggleExpandCollapseAll(page, "keyboard", "Space");
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+    });
+
+    test("Collapse All should close all accordions", async ({ page }) => {
+      // First open them all.
+      await toggleExpandCollapseAll(page, "keyboard", "Space");
+      const accordionButtons = await page.$$(".accordion-item__toggle");
+      await checkAccordionAriaExpandedState(accordionButtons, "true");
+
+      // Now close them all
+      await toggleExpandCollapseAll(page, "keyboard", "Space");
+      await checkAccordionAriaExpandedState(accordionButtons, "false");
+    });
   });
 });
 
