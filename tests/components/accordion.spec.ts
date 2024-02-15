@@ -1,8 +1,10 @@
-import { expect, test } from "@playwright/test";
-import a11yTests from "@support/a11yTests";
-import visRegTests from "@support/visRegTests";
+import { test } from "@playwright/test";
+import { expect } from "@support/axePage";
+import tabKeyForBrowser from "@support/tabKey";
 
-test.beforeEach(async ({ page }) => {
+let tabKey = "Tab";
+test.beforeEach(async ({ page, browserName }) => {
+  tabKey = tabKeyForBrowser(browserName);
   await page.goto("/component-pages-for-e2e-testing/accordion");
   await page.waitForLoadState("load");
 });
@@ -40,14 +42,22 @@ test("second accordion title is displayed", async ({ page }) => {
 
 test("first accordion content is displayed when expanded", async ({ page }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 1" }).click();
-  await expect(page.getByRole("paragraph")).toBeVisible();
+  await expect(
+    page.getByText(
+      "Accordion content under heading 1. And let’s throw a link in here to an",
+    ),
+  ).toBeVisible();
 });
 
 test("second accordion content is displayed when expanded", async ({
   page,
 }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 2" }).click();
-  await expect(page.getByRole("main")).toBeVisible();
+  await expect(
+    page.getByText(
+      "Accordion content under heading 2. And let’s throw a link in here to an",
+    ),
+  ).toBeVisible();
 });
 
 test("Expand All should open all accordions", async ({ page }) => {
@@ -79,6 +89,44 @@ test("Collapse All should close all accordions", async ({ page }) => {
   ).not.toBeVisible();
 });
 
-visRegTests();
+test("can tab to heading 1", async ({ page, browserName, isMobile }) => {
+  if (isMobile) {
+    await page.waitForTimeout(1000);
+  }
+  // Each browser has its own number of tabs to get to the first accordion.
+  const tabCounts = {
+    chromium: 19,
+    firefox: 7,
+    webkit: {
+      mobile: 8,
+      desktop: 19,
+    },
+  };
 
-a11yTests();
+  const tabCount =
+    tabCounts[browserName]?.[isMobile ? "mobile" : "desktop"] ||
+    tabCounts[browserName];
+
+  for (let i = 0; i < tabCount; i++) {
+    await page.keyboard.press(tabKey);
+  }
+
+  await expect(
+    page.getByRole("button", { name: "Accordion Item Heading 1" }),
+  ).toBeFocused();
+});
+
+test("visual regression should match previous screenshot", async ({ page }) => {
+  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
+});
+
+test("should pass axe", async ({ page }) => {
+  const axe_tags = [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice",
+  ];
+  await expect(page).toPassAxe({ tags: axe_tags });
+});
