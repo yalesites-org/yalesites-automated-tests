@@ -9,8 +9,7 @@
 import { test, expect } from "@playwright/test";
 
 /*
-rm -rf test-results && rm -rf tests/mv482.vis.reg.spec.ts-snapshots && YALESITES_URL="https://dev-yalesites-mv482.pantheonsite.io" npx playwright test mv482.vis.reg.spec && \
- YALESITES_URL="https://d10-yalesites-mv482.pantheonsite.io" npx playwright test mv482.vis.reg.spec; npx playwright show-report
+rm -rf test-results; rm -rf snapshots/all-vis-reg.spec.ts-snapshots; YALESITES_URL="https://dev-yalesites-mv482.pantheonsite.io" npx playwright test all-vis-reg.spec; YALESITES_URL="https://d10-yalesites-mv482.pantheonsite.io" npx playwright test all-vis-reg.spec; npx playwright show-report
 */
 
 const testScreenshotForPage = (pagePath: string) => {
