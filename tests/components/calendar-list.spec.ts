@@ -48,6 +48,47 @@ test("should have a list of events", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("can use keyboard to tab to Event Category drop down", async ({ page }) => {
+  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
+  for (let i = 0; i < 18; i++) {
+    await page.keyboard.press(tabKey);
+  }
+  await expect(page.getByLabel("Event Category")).toBeFocused();
+});
+
+test("can use keyboard to tab to Apply button", async ({ page }) => {
+  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
+  for (let i = 0; i < 19; i++) {
+    await page.keyboard.press(tabKey);
+  }
+
+  await expect(page.getByRole("button", { name: "Apply" })).toBeFocused();
+});
+
+test("can use keyboard to tab to In-person Office Hours with Mike link", async ({ page }) => {
+  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press(tabKey);
+  }
+  await expect(page.getByRole("link", { name: "Office Hours with Mike" })).toBeFocused();
+});
+
+test("can use keyboard to select Staff from the drop down and apply", async ({ page }) => {
+  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
+  for (let i = 0; i < 18; i++) {
+    await page.keyboard.press(tabKey);
+  }
+
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Enter");
+
+  await expect(page.getByRole("link", { name: "Event #1 for E2E" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Office Hours with Mike" })).not.toBeVisible();
+});
+
 test("visual regression should match previous screenshot", async ({ page }) => {
   await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
 });

@@ -29,6 +29,15 @@ test("should display background image", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("can use keyboard to tab to External page link", async ({ page }) => {
+  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
+  for (let i = 0; i < 19; i++) {
+    await page.keyboard.press(tabKey);
+  }
+
+  await expect(page.getByRole("link", { name: "External page" })).toBeFocused();
+});
+
 test("visual regression should match previous screenshot", async ({ page }) => {
   await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
 });
