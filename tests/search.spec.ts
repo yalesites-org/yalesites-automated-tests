@@ -1,5 +1,4 @@
 import { test, expect, type Page, type ElementHandle } from "@playwright/test";
-import getLoginUrl from "@support/login";
 
 const DESKTOP_SEARCH_ID = "input#edit-keywords--header-search-form-desktop";
 const MOBILE_SEARCH_ID = "input#edit-keywords--header-search-form-mobile";

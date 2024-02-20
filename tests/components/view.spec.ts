@@ -1,4 +1,6 @@
-import { test } from "@playwright/test"; import { expect } from "@support/axePage"; import tabKeyForBrowser from "@support/tabKey";
+import { test } from "@playwright/test";
+import { expect } from "@support/axePage";
+import tabKeyForBrowser from "@support/tabKey";
 
 let tabKey = "Tab";
 test.beforeEach(async ({ page, browserName }) => {
@@ -38,4 +40,3 @@ test("should pass axe", async ({ page }) => {
   ];
   await expect(page).toPassAxe({ tags: axe_tags });
 });
-

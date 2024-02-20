@@ -1,4 +1,6 @@
-import { test } from "@playwright/test"; import { expect } from "@support/axePage"; import tabKeyForBrowser from "@support/tabKey";
+import { test } from "@playwright/test";
+import { expect } from "@support/axePage";
+import tabKeyForBrowser from "@support/tabKey";
 
 let tabKey = "Tab";
 test.beforeEach(async ({ page, browserName }) => {
