@@ -1,10 +1,12 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import tabKeyForBrowser from "@support/tabKey";
+import { mockClipboardAPI } from "@support/mockClipboard";
 
 let tabKey = "Tab";
 test.beforeEach(async ({ page, browserName }) => {
   tabKey = tabKeyForBrowser(browserName);
+  await mockClipboardAPI(page);
   await page.goto("/profile/tom-foolery");
   await page.waitForLoadState("load");
 });
@@ -31,7 +33,12 @@ test("has contact information", async ({ page }) => {
 });
 
 test("can copy the email address", async ({ page }) => {
-  await page.getByRole('button', { name: '(copy)' }).click();
+  await page.evaluate(() =>
+    document.querySelector("button.text-copy-button__button").click()
+  );
+
+  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  expect(clipboardText).toEqual('tom.foolery@yale.edu');
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
