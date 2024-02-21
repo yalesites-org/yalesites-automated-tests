@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/component-pages-for-e2e-testing/action-banner");
   await page.waitForLoadState("load");
 });
@@ -30,10 +30,7 @@ test("should display background image", async ({ page }) => {
 });
 
 test("can use keyboard to tab to External page link", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 19; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page);
 
   await expect(page.getByRole("link", { name: "External page" })).toBeFocused();
 });

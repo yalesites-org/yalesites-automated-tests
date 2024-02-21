@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/component-pages-for-e2e-testing/accordion");
   await page.waitForLoadState("load");
 });
@@ -89,27 +89,12 @@ test("Collapse All should close all accordions", async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test("can tab to heading 1", async ({ page, browserName, isMobile }) => {
+test("can tab to heading 1", async ({ page, isMobile }) => {
   if (isMobile) {
     await page.waitForTimeout(1000);
   }
-  // Each browser has its own number of tabs to get to the first accordion.
-  const tabCounts = {
-    chromium: 19,
-    firefox: 7,
-    webkit: {
-      mobile: 8,
-      desktop: 19,
-    },
-  };
 
-  const tabCount =
-    tabCounts[browserName]?.[isMobile ? "mobile" : "desktop"] ||
-    tabCounts[browserName];
-
-  for (let i = 0; i < tabCount; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  await pressTabKeyRepeatedly(page);
 
   await expect(
     page.getByRole("button", { name: "Accordion Item Heading 1" }),

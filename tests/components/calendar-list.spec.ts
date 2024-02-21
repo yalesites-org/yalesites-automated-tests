@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/component-pages-for-e2e-testing/calendar-list");
   await page.waitForLoadState("load");
 });
@@ -49,35 +49,23 @@ test("should have a list of events", async ({ page }) => {
 });
 
 test("can use keyboard to tab to Event Category drop down", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 18; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 18);
   await expect(page.getByLabel("Event Category")).toBeFocused();
 });
 
 test("can use keyboard to tab to Apply button", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 19; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole("button", { name: "Apply" })).toBeFocused();
 });
 
 test("can use keyboard to tab to In-person Office Hours with Mike link", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 20; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 20);
   await expect(page.getByRole("link", { name: "Office Hours with Mike" })).toBeFocused();
 });
 
 test("can use keyboard to select Staff from the drop down and apply", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 18; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 18);
 
   await page.keyboard.press("Enter");
   await page.keyboard.press("ArrowDown");

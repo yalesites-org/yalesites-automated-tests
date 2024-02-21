@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/events/event-1-for-e2e");
   await page.waitForLoadState("load");
 });

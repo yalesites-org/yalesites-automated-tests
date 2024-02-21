@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/component-pages-for-e2e-testing/button-link");
   await page.waitForLoadState("load");
 });
@@ -39,19 +39,13 @@ test("should be able to click the Yale University link button", async ({
 });
 
 test("can use keyboard to tab to Accordion Page link", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 18; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 18);
 
   await expect(page.getByRole("link", { name: "Accordion Page" })).toBeFocused();
 });
 
 test("can use keyboard to tab to Yale University link", async ({ page }) => {
-  // Note: This will fail on firefox and mobile safari due to incorrect tabbing
-  for (let i = 0; i < 19; i++) {
-    await page.keyboard.press(tabKey);
-  }
+  pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole("link", { name: "Yale University" })).toBeFocused();
 });

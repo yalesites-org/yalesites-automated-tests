@@ -1,10 +1,10 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import tabKeyForBrowser from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction }from "@support/tabKey";
 
-let tabKey = "Tab";
-test.beforeEach(async ({ page, browserName }) => {
-  tabKey = tabKeyForBrowser(browserName);
+let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
+test.beforeEach(async ({ page, browserName, isMobile }) => {
+  pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
   await page.goto("/component-pages-for-e2e-testing/custom-cards");
   await page.waitForLoadState("load");
 });
@@ -44,6 +44,24 @@ test("Third card is visible", async ({ page, isMobile }) => {
   }
   await expect(page.getByRole('link', { name: 'Custom Card Heading 3' })).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit amet consectetur adipiscing elit natoque, ad torquent')).toBeVisible();
+});
+
+test("can use keyboard to tab to first card", async ({ page }) => {
+  await pressTabKeyRepeatedly(page, 18);
+
+  await expect(page.getByRole('link', { name: 'Custom Cards Heading' })).toBeFocused();
+});
+
+test("can use keyboard to tab to second card", async ({ page }) => {
+  await pressTabKeyRepeatedly(page, 19);
+
+  await expect(page.getByRole('link', { name: 'Custom Card Heading 2' })).toBeFocused();
+});
+
+test("can use keyboard to tab to third card", async ({ page }) => {
+  await pressTabKeyRepeatedly(page, 20);
+
+  await expect(page.getByRole('link', { name: 'Custom Card Heading 3' })).toBeFocused();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
