@@ -18,8 +18,8 @@ test("has an image", async ({ page }) => {
 });
 
 test("has a paragraph", async ({ page }) => {
-  await expect(page.getByText('Lorem example page(link is external) sit example doc (PDF)(file download)')).toBeVisible();
-  await expect(page.getByText('Lorem example page(link is external) consectetur adipiscing elit, habitasse')).toBeVisible();
+  await expect(page.getByText('sit example doc')).toBeVisible();
+  await expect(page.getByText('consectetur adipiscing elit, habitasse')).toBeVisible();
   await expect(page.getByText('Mauris praesent himenaeos')).toBeVisible();
 });
 

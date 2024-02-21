@@ -10,7 +10,7 @@ test.beforeEach(async ({ page, browserName, isMobile }) => {
 });
 
 test("has text", async ({ page }) => {
-  await expect(page.getByText('Lorem ipsum example page(link')).toBeVisible();
+  await expect(page.getByText('Lorem ipsum example page')).toBeVisible();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {

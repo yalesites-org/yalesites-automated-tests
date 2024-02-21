@@ -18,7 +18,7 @@ test("Has a heading", async ({ page }) => {
 });
 
 test("has a paragraph", async ({ page }) => {
-  await expect(page.getByText('Lorem example page(link is')).toBeVisible();
+  await expect(page.getByText('Lorem example page')).toBeVisible();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {

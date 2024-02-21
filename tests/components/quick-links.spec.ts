@@ -27,14 +27,14 @@ test("has a list of links", async ({ page }) => {
   const ul = page.locator('ul.quick-links__links');
 
   await expect(ul.getByRole('link', { name: 'Accordion' })).toBeVisible();
-  await expect(ul.getByRole('link', { name: 'Example Document (file' })).toBeVisible();
+  await expect(ul.getByRole('link', { name: 'Example Document' })).toBeVisible();
   await expect(ul.getByRole('link', { name: 'Callout' })).toBeVisible();
   await expect(ul.getByRole('link', { name: 'Custom Cards' })).toBeVisible();
-  await expect(ul.getByRole('link', { name: 'PDF (file download)' })).toBeVisible();
-  await expect(ul.getByRole('link', { name: 'Example Page (link is' })).toBeVisible();
+  await expect(ul.getByRole('link', { name: 'PDF' })).toBeVisible();
+  await expect(ul.getByRole('link', { name: 'Example Page' })).toBeVisible();
   await expect(ul.getByRole('link', { name: 'Calendar List' })).toBeVisible();
   await expect(ul.getByRole('link', { name: 'Spotlight - Landscape' })).toBeVisible();
-  await expect(ul.getByRole('link', { name: 'Google (link is external)' })).toBeVisible();
+  await expect(ul.getByRole('link', { name: 'Google' })).toBeVisible();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {

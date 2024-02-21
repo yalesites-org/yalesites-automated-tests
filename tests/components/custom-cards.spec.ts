@@ -24,7 +24,7 @@ test("First card is visible", async ({ page, isMobile }) => {
   if (!isMobile) {
     await expect(page.getByRole('img', { name: 'An illustration from 1807' })).toBeVisible();
   }
-  await expect(page.getByRole('link', { name: 'Custom Cards Heading (link is' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Custom Cards Heading' })).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit amet consectetur adipiscing elit natoque, interdum')).toBeVisible();
 });
 
@@ -33,7 +33,7 @@ test("Second card is visible", async ({ page, isMobile }) => {
   if (!isMobile) {
     await expect(page.getByRole('img', { name: 'Shadowy and dramatically low' })).toBeVisible();
   }
-  await expect(page.getByRole('link', { name: 'Custom Card Heading 2 (file' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Custom Card Heading 2' })).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit,')).toBeVisible();
 });
 

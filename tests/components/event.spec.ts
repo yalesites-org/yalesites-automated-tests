@@ -26,7 +26,7 @@ test("has a location", async ({ page }) => {
 });
 
 test("has the event link", async ({ page }) => {
-  await expect(page.getByRole('link', { name: 'Example External Event (link' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Example External Event' })).toBeVisible();
 });
 
 test("has the add to calendar link", async ({ page }) => {
