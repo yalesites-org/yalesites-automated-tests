@@ -30,7 +30,7 @@ test("can fill out the form and submit it", async ({ page }) => {
   await page.getByLabel('Your Name').click();
   await page.getByLabel('Your Name').fill('Person One');
   await page.getByLabel('Your Name').press('Tab');
-  await page.getByLabel('Your Email').fill('person.one@yale.edu');
+  await page.getByLabel('Your Email').fill('person.one@noreply.yale.edu');
   await page.getByLabel('Your Email').press('Tab');
   await page.getByLabel('Subject').fill('A person');
   await page.getByLabel('Subject').press('Tab');
