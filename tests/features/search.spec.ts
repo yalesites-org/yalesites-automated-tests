@@ -111,6 +111,17 @@ const tests = () => {
     // search box's width
     expect(placeholderWidth).toBeLessThanOrEqual(searchWidth);
   });
+
+  test("can find a profile", async ({ page }) => {
+    const search = await page.$(await getSearchId(page));
+
+    await search?.fill("Foolery");
+    await search?.press("Enter");
+
+    await page.waitForSelector("div.search-result");
+
+    expect(await page.textContent("div.search-result")).toContain("Tom Foolery");
+  });
 };
 
 test.beforeEach(async ({ page }) => {
