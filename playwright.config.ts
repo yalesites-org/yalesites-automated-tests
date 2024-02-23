@@ -33,7 +33,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // use environment varaible YALESITES_URL or default to yalesites-platform.lndo.site
     baseURL:
-      process.env.YALESITES_URL || "https://yalesites-platform.lndo.site",
+      process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",

@@ -13,8 +13,12 @@ rm -rf test-results; rm -rf snapshots/all-vis-reg.spec.ts-snapshots; YALESITES_U
 */
 
 const testScreenshotForPage = (pagePath: string) => {
-  const url = `${process.env.YALESITES_URL || "http://yalesites-platform.lndo.site"}/${pagePath}`;
+  // Sleep for 5 seconds to not bombard the server
+  // setTimeout(() => {}, 5000);
+  const subPath = "component-pages-for-e2e-testing"
+  const url = `${process.env.YALESITES_URL || "http://yalesites-platform.lndo.site"}/${subPath}/${pagePath}`;
   return test(`should compare ${pagePath}`, async ({ page }) => {
+    // await page.waitForTimeout(5000);
     await page.goto(url);
     await expect(page).toHaveScreenshot({
       fullPage: true,
