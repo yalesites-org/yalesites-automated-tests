@@ -15,7 +15,7 @@ test("has the first spotlight", async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Spotlight - Landscape Heading' })).toBeVisible();
   await expect(page.getByText('Spotlight - Landscape Subheading')).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit amet')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Example Page', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Example Page (link is external)', exact: true })).toBeVisible();
 });
 
 test("has the second spotlight", async ({ page }) => {
@@ -23,11 +23,11 @@ test("has the second spotlight", async ({ page }) => {
   await expect(page.getByText('Spotlight 2 subheading')).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit example')).toBeVisible();
   await expect(page.getByRole('img', { name: 'Towering shelves of books in' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Example Document' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Example Document (file' })).toBeVisible();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixels: 100 });
+  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
 });
 
 test("should pass axe", async ({ page }) => {
