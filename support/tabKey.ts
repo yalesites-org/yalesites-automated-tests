@@ -1,26 +1,35 @@
 import { Page } from "@playwright/test";
 
 export type TabCounts = {
-  [key: string]: number | { mobile: number; desktop: number };
+  [browser: string]:
+    | {
+        [platform: string]: number;
+      }
+    | number;
 };
 
-export type PressKeyForBrowserFunction =
-  (page: Page, times?: number | TabCounts) => Promise<void>;
+export type PressKeyForBrowserFunction = (
+  page: Page,
+  times?: number | TabCounts,
+) => Promise<void>;
 
 export type Platform = "desktop" | "mobile";
 
 /**
  * The default number of tabs to press for each browser
+ * This could change in the fututre; feels too opinionated.
  */
-const BROWSER_DEFAULTS = {
-  chromium: 19,
-  firefox: 7,
+const BROWSER_DEFAULTS: TabCounts = {
   webkit: {
-    mobile: 8,
-    desktop: 19,
+    mobile: 24,
+    desktop: 46,
   },
-  default: 0,
+  firefox: {
+    desktop: 18,
+  },
+  default: 18,
 };
+// Create a type for the above object.
 
 /**
  * Get the tab key for the browser
@@ -28,10 +37,10 @@ const BROWSER_DEFAULTS = {
  * @returns {string} - The tab key for the browser
  */
 export function tabKeyForBrowser(browserType: string): string {
-  const SafariNames = ["webkit", "Mobile Safari", "Safari"];
+  const altTabBrowsers = ["webkit", "mobile safari", "safari"];
   let key = "Tab";
 
-  if (SafariNames.includes(browserType)) {
+  if (altTabBrowsers.includes(browserType.toLowerCase())) {
     key = "Alt+Tab";
   }
 
@@ -43,10 +52,16 @@ export function tabKeyForBrowser(browserType: string): string {
  * @param {string} browserType - The browser type
  * @returns {PressKeyForBrowserFunction} - The function to press the tab key for the browser
  */
-export function pressKeyForBrowser(browserType: string, isMobile: boolean): PressKeyForBrowserFunction {
-  return async (page: Page, times: number | TabCounts = BROWSER_DEFAULTS): Promise<void> => {
+export function pressKeyForBrowser(
+  browserType: string,
+  isMobile: boolean,
+): PressKeyForBrowserFunction {
+  return async (
+    page: Page,
+    times: number | TabCounts = BROWSER_DEFAULTS,
+  ): Promise<void> => {
     pressKey(page, times, tabKeyForBrowser(browserType), browserType, isMobile);
-  }
+  };
 }
 
 /**
@@ -56,7 +71,13 @@ export function pressKeyForBrowser(browserType: string, isMobile: boolean): Pres
  * @param {string} key - The key to press
  * @returns {Promise<void>} - The promise
  */
-export async function pressKey(page: Page, times: number | TabCounts, key: string, browserName: string, isMobile: boolean): Promise<void> {
+export async function pressKey(
+  page: Page,
+  times: number | TabCounts,
+  key: string,
+  browserName: string,
+  isMobile: boolean,
+): Promise<void> {
   let numberOfPresses: number;
   if (typeof times === "number") {
     numberOfPresses = Number(times);
@@ -67,6 +88,10 @@ export async function pressKey(page: Page, times: number | TabCounts, key: strin
 
   for (let i = 0; i < numberOfPresses; i++) {
     await page.keyboard.press(key);
+    let activeElement = await page.evaluate(() => {
+      return `${document.activeElement.tagName}: ${document.activeElement.classList}`;
+    });
+    // console.log(`Active element after pressing ${key} ${i + 1} times: ${activeElement}`);
   }
 }
 
@@ -77,14 +102,18 @@ export async function pressKey(page: Page, times: number | TabCounts, key: strin
  * @param {string} browserName - The browser name
  * @returns {number} - The number of times to press the key
  */
-function findNumberOfPresses(browserTabNumbers: TabCounts, platform: string, browserName: string): number {
+function findNumberOfPresses(
+  browserTabNumbers: TabCounts,
+  platform: string,
+  browserName: string,
+): number {
   let numberOfPresses = browserTabNumbers[browserName]?.[platform];
 
   if (numberOfPresses === undefined) {
-    if (typeof browserTabNumbers[browserName] === 'number') {
+    if (typeof browserTabNumbers[browserName] === "number") {
       numberOfPresses = browserTabNumbers[browserName];
     } else {
-      numberOfPresses = browserTabNumbers['default'] ?? 0;
+      numberOfPresses = browserTabNumbers["default"] ?? 0;
     }
   }
 
