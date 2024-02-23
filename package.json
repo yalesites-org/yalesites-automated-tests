@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "ui": "playwright test --ui",
+    "debug": "playwright test --debug",
+    "dev": "playwright test --reporter line"
   },
   "keywords": [],
   "author": "",
