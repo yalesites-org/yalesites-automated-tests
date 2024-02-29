@@ -22,6 +22,7 @@ test("has a link", async ({ page }) => {
 });
 
 test("has a button", async ({ page }) => {
+  // Note, playing in firefox?
   await expect(page.getByRole('button', { name: 'Play the Video' }).nth(1)).toBeVisible();
 });
 

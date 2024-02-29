@@ -15,7 +15,7 @@ test("has the first spotlight", async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Spotlight - Portrait Heading' })).toBeVisible();
   await expect(page.getByText('Spotlight - Portrait Subheading')).toBeVisible();
   await expect(page.getByText('Lorem ipsum dolor sit amet').first()).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Example Page', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Example Page (link is external)', exact: true })).toBeVisible();
 
 });
 
