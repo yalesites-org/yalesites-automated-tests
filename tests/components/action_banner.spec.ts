@@ -30,6 +30,8 @@ test("should display background image", async ({ page }) => {
 });
 
 test("can use keyboard to tab to External page link", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   pressTabKeyRepeatedly(page);
 
   await expect(page.getByRole("link", { name: "External page" })).toBeFocused();

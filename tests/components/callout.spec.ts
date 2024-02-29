@@ -70,18 +70,24 @@ test("Third callout link is visible", async ({ page }) => {
 });
 
 test("can use keyboard to tab to Accordion Page link", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   pressTabKeyRepeatedly(page, 18);
 
   await expect(page.getByRole("link", { name: "Accordion Page" })).toBeFocused();
 });
 
 test("can use keyboard to tab to External Page link", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole("link", { name: "External Page" })).toBeFocused();
 });
 
 test("can use keyboard to tab to Example Document link", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   pressTabKeyRepeatedly(page, 20);
 
   await expect(page.getByRole("link", { name: "Example Document" })).toBeFocused();

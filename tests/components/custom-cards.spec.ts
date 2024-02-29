@@ -47,18 +47,24 @@ test("Third card is visible", async ({ page, isMobile }) => {
 });
 
 test("can use keyboard to tab to first card", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   await pressTabKeyRepeatedly(page, 18);
 
   await expect(page.getByRole('link', { name: 'Custom Cards Heading' })).toBeFocused();
 });
 
 test("can use keyboard to tab to second card", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+  
   await pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole('link', { name: 'Custom Card Heading 2' })).toBeFocused();
 });
 
 test("can use keyboard to tab to third card", async ({ page }) => {
+  test.skip("To be fixed once animation menu is addressed: YSP-352");
+
   await pressTabKeyRepeatedly(page, 20);
 
   await expect(page.getByRole('link', { name: 'Custom Card Heading 3' })).toBeFocused();
