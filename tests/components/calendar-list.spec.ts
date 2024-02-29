@@ -48,31 +48,23 @@ test("should have a list of events", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("can use keyboard to tab to Event Category drop down", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to Event Category drop down", async ({ page }) => {
   pressTabKeyRepeatedly(page, 18);
   await expect(page.getByLabel("Event Category")).toBeFocused();
 });
 
-test("can use keyboard to tab to Apply button", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to Apply button", async ({ page }) => {
   pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole("button", { name: "Apply" })).toBeFocused();
 });
 
-test("can use keyboard to tab to In-person Office Hours with Mike link", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to In-person Office Hours with Mike link", async ({ page }) => {
   pressTabKeyRepeatedly(page, 20);
   await expect(page.getByRole("link", { name: "Office Hours with Mike" })).toBeFocused();
 });
 
-test("can use keyboard to select Staff from the drop down and apply", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to select Staff from the drop down and apply", async ({ page }) => {
   pressTabKeyRepeatedly(page, 18);
 
   await page.keyboard.press("Enter");

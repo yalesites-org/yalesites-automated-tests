@@ -69,25 +69,19 @@ test("Third callout link is visible", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("can use keyboard to tab to Accordion Page link", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to Accordion Page link", async ({ page }) => {
   pressTabKeyRepeatedly(page, 18);
 
   await expect(page.getByRole("link", { name: "Accordion Page" })).toBeFocused();
 });
 
-test("can use keyboard to tab to External Page link", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to External Page link", async ({ page }) => {
   pressTabKeyRepeatedly(page, 19);
 
   await expect(page.getByRole("link", { name: "External Page" })).toBeFocused();
 });
 
-test("can use keyboard to tab to Example Document link", async ({ page }) => {
-  test.skip("To be fixed once animation menu is addressed: YSP-352");
-
+test.skip("can use keyboard to tab to Example Document link", async ({ page }) => {
   pressTabKeyRepeatedly(page, 20);
 
   await expect(page.getByRole("link", { name: "Example Document" })).toBeFocused();
