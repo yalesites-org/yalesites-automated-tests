@@ -2,6 +2,14 @@
 
 End to end testing for Yalesites Project.
 
+## Installation
+
+```bash
+gh repo clone yale-org/yalesites-automated-tests
+cd yalesites-automated-tests
+npm i -D
+```
+
 ## Usage
 
 ```bash
