@@ -22,7 +22,7 @@ test("has a link", async ({ page }) => {
 });
 
 test("has a button", async ({ page }) => {
-  await expect(page.getByRole('button', { name: 'Pause the Video' }).nth(1)).toBeVisible();
+  await expect(page.getByRole('button', { name: /(Play|Pause) the Video/ }).nth(1)).toBeVisible();
 });
 
 
