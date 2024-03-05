@@ -6,7 +6,6 @@ const runTests = () => {
   test("Create a new page content type", async ({ page }) => {
     await page.goto("/node/add/page");
 
-    await page.getByLabel('Title', { exact: true }).click();
     await page.getByLabel('Title', { exact: true }).fill('Test page');
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -16,16 +15,16 @@ const runTests = () => {
   test("Create a new post content type", async ({ page }) => {
     await page.goto("/node/add/post");
 
-    await page.getByLabel('Title', { exact: true }).fill('Test page');
+    await page.getByRole('textbox', { name: 'Title *' }).fill('Test Post');
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page).toHaveTitle("Edit layout for Test page | YaleSites");
+    await expect(page).toHaveTitle("Edit layout for Test Post | YaleSites");
   });
 
   test("Create a new event content type", async ({ page }) => {
     await page.goto("/node/add/event");
 
-    await page.getByLabel('Title', { exact: true }).fill('Test Event');
+    await page.getByRole('textbox', { name: 'Title *' }).fill('Test Event');
     await page.getByLabel('In-person').check();
     await page.locator('#edit-field-event-date-0-time-wrapper-value-date').press('ArrowLeft');
     await page.locator('#edit-field-event-date-0-time-wrapper-value-date').press('ArrowLeft');
@@ -34,7 +33,7 @@ const runTests = () => {
     await page.locator('#edit-field-event-date-0-time-wrapper-value-time').fill('17:00');
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page).toHaveTitle("Edit layout for Test page | YaleSites");
+    await expect(page).toHaveTitle("Edit layout for Test Event | YaleSites");
   });
 
   test("Create a new profile content type", async ({ page }) => {
@@ -44,7 +43,7 @@ const runTests = () => {
     await page.getByLabel('Last Name', { exact: true }).fill('User');
     await page.getByRole('button', { name: 'Save' }).click();
 
-    await expect(page).toHaveTitle("Edit layout for Test page | YaleSites");
+    await expect(page).toHaveTitle("Edit layout for Test User | YaleSites");
   });
 };
 
