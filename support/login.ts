@@ -10,6 +10,15 @@ type LoginOptions = {
   multidev?: string;
 };
 
+/*
+ * Get the login URL for a user
+ * @param options
+ * @param options.user - the username of the user
+ * @param options.roles - an array of roles to assign to the user
+ * @param options.drupalPath - the path to the Drupal project
+ * @param options.multidev - the multidev environment to use
+ * @returns the login URL
+ */
 function getLoginUrl(options: LoginOptions): string {
   const user = options.user || "admin";
   const drupalPath = options.drupalPath || "../yalesites-project";
@@ -29,6 +38,12 @@ function getLoginUrl(options: LoginOptions): string {
   }
 }
 
+/*
+ * Check if a user exists
+ * @param drupalPath - the path to the Drupal project
+ * @param username - the username to check
+ * @returns true if the user exists, false if not
+ */
 function doesUserExist(drupalPath: string, username: string) {
   const opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
   const cmd = `lando drush user:information ${username}`;
@@ -40,6 +55,12 @@ function doesUserExist(drupalPath: string, username: string) {
   }
 }
 
+/*
+ * Create a user
+ * @param drupalPath - the path to the Drupal project
+ * @param username - the username to create
+ * @returns true if the user was created, false if not
+ */
 function createUser(drupalPath: string, username: string) {
   const opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
   const cmd = `lando drush user:create ${username}`;
@@ -51,6 +72,13 @@ function createUser(drupalPath: string, username: string) {
   }
 }
 
+/*
+ * Assign roles to a user
+ * @param drupalPath - the path to the Drupal project
+ * @param username - the username to assign roles to
+ * @param roles - an array of roles to assign
+ * @returns true if the roles were assigned, false if not
+ */
 function assignRoles(
   drupalPath: string,
   username: string,
