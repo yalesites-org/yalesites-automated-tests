@@ -50,19 +50,19 @@ export default defineConfig({
 
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions, storageState: 'playwright/.auth/user.json' },
+      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
       dependencies: ["setup"],
     },
 
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"], contextOptions: launchOptions, storageState: 'playwright/.auth/user.json' },
+      use: { ...devices["Desktop Firefox"], contextOptions: launchOptions },
       dependencies: ["setup"],
     },
 
     {
       name: "webkit",
-      use: { ...devices["Desktop Safari"], contextOptions: launchOptions, storageState: 'playwright/.auth/user.json' },
+      use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
       dependencies: ["setup"],
     },
 
@@ -73,7 +73,7 @@ export default defineConfig({
     // },
     {
       name: "Mobile Safari",
-      use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions, storageState: 'playwright/.auth/user.json' },
+      use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
       dependencies: ["setup"],
     },
 
