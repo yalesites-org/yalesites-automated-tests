@@ -76,6 +76,11 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
     // },
+    {
+      name: 'Support Tests',
+      testMatch: 'supportTests/*.spec.ts',
+      use: { ...devices['Desktop Chrome'], contextOptions: launchOptions },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
