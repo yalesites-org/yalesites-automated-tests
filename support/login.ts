@@ -96,4 +96,13 @@ function assignRoles(
   return true;
 }
 
-export { getLoginUrl, doesUserExist, createUser, assignRoles };
+function ensureLoggedIn(user: string, roles: Array<string>, drupalPath: string) {
+  if (!doesUserExist(drupalPath, user)) {
+    createUser(drupalPath, user);
+  }
+
+  assignRoles(drupalPath, user, roles);
+  return getLoginUrl({ user, drupalPath, roles });
+}
+
+export { getLoginUrl, doesUserExist, createUser, assignRoles, ensureLoggedIn };
