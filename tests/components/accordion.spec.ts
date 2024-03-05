@@ -1,6 +1,7 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import { doesUserExist } from "@support/login";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
