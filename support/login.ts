@@ -1,29 +1,24 @@
 import { execSync, type ExecSyncOptions } from "child_process";
 
-const LOCAL_CMD = "lando drush uli";
-const REMOTE_CMD = "terminus drush ~ -- user:login";
+const LOCAL_CMD = "lando drush {DRUSH_OPTS}";
+const REMOTE_CMD = "terminus drush {LOCATION} -- {DRUSH_OPTS}";
 
 type LoginOptions = {
-  user?: string,
-  roles: Array<string>,
-  drupalPath: string,
+  user?: string;
+  roles: Array<string>;
+  drupalPath: string;
+  multidev?: string;
 };
 
 function getLoginUrl(options: LoginOptions): string {
   const user = options.user || "admin";
-  const roles = options.roles || [];
   const drupalPath = options.drupalPath || "../yalesites-project";
 
   let cmd = LOCAL_CMD;
   let opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
 
   cmd = cmd + ` ${user}`;
-
-  // If the path is a reference to a pantheon name with .dev, .live, .test extension.
-  // if (pathToUse.match(/\.dev|\.live|\.test/)) {
-  //   cmd = REMOTE_CMD.replace("~", drupalPath);
-  //   opts = { stdio: "pipe" };
-  // }
+  cmd = cmd.replace("{DRUSH_OPTS}", "user:login");
 
   try {
     const stdout = execSync(cmd, opts);
@@ -41,7 +36,7 @@ function doesUserExist(drupalPath: string, username: string) {
     execSync(cmd, opts);
     return true;
   } catch (err) {
-    return false
+    return false;
   }
 }
 
@@ -56,8 +51,21 @@ function createUser(drupalPath: string, username: string) {
   }
 }
 
-export {
-  getLoginUrl,
-  doesUserExist,
-  createUser,
+function assignRoles(
+  drupalPath: string,
+  username: string,
+  roles: Array<string>,
+) {
+  const opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
+  roles.forEach((role) => {
+    const cmd = `lando drush user:role:add ${role} ${username}`;
+    try {
+      execSync(cmd, opts);
+    } catch (err) {
+      return false;
+    }
+  });
+  return true;
 }
+
+export { getLoginUrl, doesUserExist, createUser, assignRoles };
