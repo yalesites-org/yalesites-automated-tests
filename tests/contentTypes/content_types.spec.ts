@@ -1,6 +1,5 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import { ensureLoggedIn } from "@support/login";
 
 const runTests = () => {
   test("Create a new page content type", async ({ page }) => {
