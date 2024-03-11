@@ -19,3 +19,8 @@ test("can create a new event", async ({ page }) => {
   })).toBe(true);
   expect(await page.title()).toBe("Edit layout for My new event | YaleSites");
 });
+
+test("can create a post", async ({ page }) => {
+  expect(await createContentType(page, "post", { Title: "My new post", "Teaser Title": "Hi" })).toBe(true);
+  expect(await page.title()).toBe("Edit layout for My new post | YaleSites");
+});
