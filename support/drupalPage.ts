@@ -5,7 +5,7 @@ type PageType = "profile" | "page" | "post" | "event";
 
 interface ContentTypeOptions {
   event: {
-    title: string;
+    Title: string;
     event_type: "In-person" | "Online";
     start_date: Date;
     start_time: string;
@@ -14,11 +14,11 @@ interface ContentTypeOptions {
     [key: string]: any;
   },
   page: {
-    title: string,
+    Title: string,
     [key: string]: any;
   },
   post: {
-    title: string,
+    Title: string,
     [key: string]: any;
   },
   profile: {
@@ -44,18 +44,46 @@ async function createContentType(
 
   try {
     // For each item inside of pageType, loop through and set each value.
-    for (const [key, value] of Object.entries(opts)) {
-      if (typeof value === "string") {
-        await page.fill(`[name="${key}[0][value]"]`, value);
-      } else if (Array.isArray(value)) {
-        for (const item of value) {
-          await page.fill(`[name="${key}[0][value]"]`, item);
-        }
-      } else if (typeof value === "object") {
-        for (const [subKey, subValue] of Object.entries(value)) {
-          await page.fill(`[name="${key}[${subKey}][0][value]"]`, subValue);
-        }
+    for (let [key, value] of Object.entries(opts)) {
+      let method = "fill";
+      // Check if value is actually the boolean true or false
+      if (value === true) {
+        method = "check";
       }
+      // If value is a date, get the string of it.
+      else if (value instanceof Date) {
+        value = value.toISOString().split("T")[0];
+      }
+      // If value ends in AM or PM, we have to fill in the hour, then tab, then fill in the minute, then tab, then fill in the AM/PM
+      else if (value.match(/(AM|PM)$/)) {
+        let timeParts = value.split(" ");
+        let [hour, minute] = timeParts[0].split(":");
+        let ampm = timeParts[1];
+
+        if (ampm === "PM" && hour !== "12") {
+          hour = String(Number(hour) + 12);
+        } else if (ampm === "AM" && hour === "12") {
+          hour = "00";
+        }
+        console.log(hour, minute, ampm);
+
+        // Make sure it's in the form HH:mm where HH is 00-23
+        if (hour.length === 1) {
+          hour = `0${hour}`;
+        }
+        console.log(hour, minute, ampm);
+
+        value = `${hour}:${minute}`;
+        console.log(value);
+      }
+
+      // Can support selectors or just text to get the input
+      if (!key.match(/^[#.]/)) {
+        await page.getByLabel(key, { exact: true })[method](value);
+      } else {
+        await page.locator(key)[method](value);
+      }
+
     }
 
     await page.getByRole('button', { name: 'Save' }).click();
