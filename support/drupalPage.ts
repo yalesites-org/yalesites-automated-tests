@@ -1,5 +1,4 @@
 import { type Page } from "@playwright/test";
-import { ensureLoggedIn } from "@support/login";
 
 type PageType = "profile" | "page" | "post" | "event";
 
@@ -54,36 +53,26 @@ async function createContentType(
       else if (value instanceof Date) {
         value = value.toISOString().split("T")[0];
       }
-      // If value ends in AM or PM, we have to fill in the hour, then tab, then fill in the minute, then tab, then fill in the AM/PM
+      // If value ends in AM or PM, we have to fill in the hour, then tab, then
+      // fill in the minute, then tab, then fill in the AM/PM
       else if (value.match(/(AM|PM)$/)) {
-        let timeParts = value.split(" ");
-        let [hour, minute] = timeParts[0].split(":");
-        let ampm = timeParts[1];
-
-        if (ampm === "PM" && hour !== "12") {
-          hour = String(Number(hour) + 12);
-        } else if (ampm === "AM" && hour === "12") {
-          hour = "00";
-        }
-        console.log(hour, minute, ampm);
-
-        // Make sure it's in the form HH:mm where HH is 00-23
-        if (hour.length === 1) {
-          hour = `0${hour}`;
-        }
-        console.log(hour, minute, ampm);
-
-        value = `${hour}:${minute}`;
-        console.log(value);
+        value = toMilitaryTime(value);
       }
 
+      let element = null;
       // Can support selectors or just text to get the input
       if (!key.match(/^[#.]/)) {
-        await page.getByLabel(key, { exact: true })[method](value);
+        // For some reason, the required asterisk is sometimes used as part of
+        // the label, and so it doesn't properly match.  This ensures that we
+        // cover that situation so that we can consitently get the right input.
+        const regex = new RegExp(`${key}(?: \\*)?`);
+
+        element = page.getByLabel(regex);
       } else {
-        await page.locator(key)[method](value);
+        element = page.locator(key);
       }
 
+      await element[method](value);
     }
 
     await page.getByRole('button', { name: 'Save' }).click();
@@ -92,6 +81,45 @@ async function createContentType(
   }
 
   return true;
+}
+
+/*
+ * Convert a time from AM/PM to 24-hour time
+ *
+ * @param time - the time to convert
+ *
+ * @returns the time in 24-hour format
+ *
+ * @example
+ * toMilitaryTime("12:00 PM") // 12:00
+ * toMilitaryTime("12:00 AM") // 00:00
+ * toMilitaryTime("3:00 PM") // 15:00
+ * toMilitaryTime("3:00 AM") // 03:00
+ * toMillitaryTime("15:00") // 15:00
+ * toMillitaryTime("blah") // blah
+ */
+function toMilitaryTime(time: string) {
+  let timeParts = time.split(" ");
+  let [hour, minute] = timeParts[0].split(":");
+
+  if (hour === '' || parseInt(hour) > 12) {
+    return time;
+  }
+
+  let ampm = timeParts[1];
+
+  if (ampm === "PM" && hour !== "12") {
+    hour = String(Number(hour) + 12);
+  } else if (ampm === "AM" && hour === "12") {
+    hour = "00";
+  }
+
+  // Make sure it's in the form HH:mm where HH is 00-23
+  if (hour.length === 1) {
+    hour = `0${hour}`;
+  }
+
+  return `${hour}:${minute}`;
 }
 
 export { createContentType, ContentTypeOptions, PageType }
