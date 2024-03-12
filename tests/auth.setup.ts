@@ -1,4 +1,4 @@
-import { test as setup, expect, type Page } from "@playwright/test";
+import { test as setup } from "@playwright/test";
 import { ensureLoggedIn } from "@support/login";
 
 const siteAdminFile = 'playwright/.auth/siteAdmin.json';
