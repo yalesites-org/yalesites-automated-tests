@@ -119,31 +119,55 @@ const createBlock = async (page: Page, blockType: BlockType, block: Partial<Bloc
 
   await page.getByRole('link', { name: 'Add block in Content Section' }).last().click({ force: true });
   await page.waitForSelector('text=Choose a block');
-  await page.getByRole('link', { name: blockTypeLabel }).click();
+  await page.getByRole('link', { name: blockTypeLabel }).first().click({ force: true });
 
-  const selectItems = ["Text Style Variation"];
+  await fillInForm(page, block);
 
-  for (const key in block) {
-    let label = key.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  await page.getByRole('button', { name: 'Add block' }).click({ force: true });
+
+  return true;
+};
+
+const fillInForm = async (page: Page, elements: { [key: string]: any }, index: number = 0) => {
+  for (const key in elements) {
+    await fillInFormElement(page, key, elements[key], index);
+  }
+}
+
+const fillInFormElement = async (page: Page, key: string, value: any, index: number = 0) => {
+  if (value instanceof Array) {
+    for (let index = 0; index < value.length; index++) {
+      await fillInForm(page, value[index], index);
+      // Click the "Add another item" button if it's not the last one.
+      if (index !== (value.length - 1)) {
+        await page.getByRole('button', { name: 'Add another item' }).click();
+      }
+    }
+  } else if (value instanceof Object) {
+    await fillInForm(page, value, 0);
+  } else {
+    let label = humanize(key);
     // If label contains content, rename it to target 'Editor editing area: main'
     if (label.includes('Content')) {
       label = 'Editor editing area: main';
     }
 
-    let fn = 'fill';
+    const regex = new RegExp(label, 'i');
+    const element = page.getByLabel(regex).nth(index);
+    const tagName = await element.evaluate(node => node.tagName);
 
-    if (block[key] === true || block[key] === false) {
-      fn = 'setChecked';
-    } else if (selectItems.includes(label)) {
-      fn = 'selectOption';
+    if (value === true || value === false) {
+      await element.setChecked(value);
+    } else if (tagName === 'SELECT') {
+      await element.selectOption(value);
+    } else {
+      await element.fill(value);
     }
-
-    await page.getByLabel(label).first()[fn](block[key]);
   }
+};
 
-  await page.getByRole('button', { name: 'Add block' }).click({ force: true });
-
-  return true;
+const humanize = (str: string) => {
+  return str.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
 export { createBlock };

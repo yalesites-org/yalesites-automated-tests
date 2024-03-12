@@ -98,35 +98,20 @@ async function createContentType(
   try {
     // For each item inside of pageType, loop through and set each value.
     for (let [key, value] of Object.entries(modifiedOpts)) {
-      let method = "fill";
-      // Check if value is actually the boolean true or false
-      if (value === true) {
-        method = "check";
-      }
+      let method = getInputMethod(value);
+
       // If value is a date, get the string of it.
-      else if (value instanceof Date) {
+      if (value instanceof Date) {
         value = value.toISOString().split("T")[0];
       }
       // If value ends in AM or PM, we have to fill in the hour, then tab, then
       // fill in the minute, then tab, then fill in the AM/PM
-      else if (value.match(/(AM|PM)$/)) {
+      else if (typeof value === 'string' && value.match(/(AM|PM)$/)) {
         value = toMilitaryTime(value);
       }
 
-      let element = null;
-      // Can support selectors or just text to get the input
-      if (!key.match(/^[#.]/)) {
-        element = page.getByLabel(key);
-      } else {
-        element = page.locator(key);
-      }
-
-      // Try to always pick the first one if we still can't pinpoint the right one.
-      // But we'll let the users know they need to address it.
-      if (element['first'] !== undefined) {
-        console.warn(`Multiple elements found for ${key}.  Using the first one.`);
-        element = element.first();
-      }
+      let locatorFn = getLocatorFn(key);
+      let element = page[locatorFn](key).first();
 
       await element[method](value);
     }
@@ -138,6 +123,24 @@ async function createContentType(
   }
 
   return true;
+}
+
+function getInputMethod(value: any) {
+  let method = "fill";
+
+  if (value === true || value === false) {
+    method = "setChecked";
+  }
+
+  return method;
+}
+
+function getLocatorFn(key: string) {
+  let locatorFn = "getByLabel";
+  if (key.match(/^[#.]/)) {
+    locatorFn = "locator";
+  }
+  return locatorFn;
 }
 
 /*
@@ -155,7 +158,7 @@ async function createContentType(
  * toMillitaryTime("15:00") // 15:00
  * toMillitaryTime("blah") // blah
  */
-function toMilitaryTime(time: string) {
+function toMilitaryTime(time: String) {
   let timeParts = time.split(" ");
   let [hour, minute] = timeParts[0].split(":");
 
@@ -176,6 +179,7 @@ function toMilitaryTime(time: string) {
     hour = `0${hour}`;
   }
 
+  console.log(`${hour}:${minute}`);
   return `${hour}:${minute}`;
 }
 
