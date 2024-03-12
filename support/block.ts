@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 
 type BlockType = "text" | "image" | "video" | "wrapped_image" | "quote" | "button_link" | "callout" | "divider" | "spotlight_landscape" | "spotlight_portrait" | "quick_links";
 
@@ -33,6 +33,7 @@ interface Block {
     position: "Image Left" | "Image Right";
     offset: "Offset" | "Inline";
     reusable_block: boolean;
+    [key: string]: any;
   },
   quote: {
     administrative_label: string;
@@ -40,6 +41,7 @@ interface Block {
     attribution?: string;
     style: "Bar Left" | "Bar Right" | "Quote Left";
     reusable_block: boolean;
+    [key: string]: any;
   },
   button_link: {
     administrative_label: string;
@@ -48,6 +50,7 @@ interface Block {
       title: string;
     }[];
     reusable_block: boolean;
+    [key: string]: any;
   },
   callout: {
     administrative_label: string;
@@ -62,12 +65,14 @@ interface Block {
     alignment: "Center" | "Left";
     background_color: "One" | "Two" | "Three";
     reusable_block: boolean;
+    [key: string]: any;
   },
   divider: {
     administrative_label: string;
     divider_position: "Left" | "Center";
     divider_width: "100" | "75" | "50" | "25";
     reusable_block: boolean;
+    [key: string]: any;
   },
   spotlight_landscape: {
     administrative_label: string;
@@ -84,6 +89,7 @@ interface Block {
     image_size: "Large" | "Medium";
     focus: "Equal Focus" | "Image Focus";
     reusable_block: boolean;
+    [key: string]: any;
   },
   spotlight_portrait: {
     administrative_label: string;
@@ -99,6 +105,7 @@ interface Block {
     image_position: "Image Left" | "Image Right";
     image_style: "Inline" | "Offset";
     reusable_block: boolean;
+    [key: string]: any;
   },
   quick_links: {
     administrative_label: string;
@@ -110,6 +117,7 @@ interface Block {
     }[];
     image: string;
     reusable_block: boolean;
+    [key: string]: any;
   },
 };
 
@@ -154,20 +162,24 @@ const fillInFormElement = async (page: Page, key: string, value: any, index: num
 
     const regex = new RegExp(label, 'i');
     const element = page.getByLabel(regex).nth(index);
-    const tagName = await element.evaluate(node => node.tagName);
-
-    if (value === true || value === false) {
-      await element.setChecked(value);
-    } else if (tagName === 'SELECT') {
-      await element.selectOption(value);
-    } else {
-      await element.fill(value);
-    }
+    await fillAny(element, value);
   }
 };
 
 const humanize = (str: string) => {
   return str.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
+
+const fillAny = async (element: Locator, value: any) => {
+  const tagName = await element.evaluate(node => node.tagName);
+
+  if (value === true || value === false) {
+    await element.setChecked(value);
+  } else if (tagName === 'SELECT') {
+    await element.selectOption(value);
+  } else {
+    await element.fill(value);
+  }
+}
 
 export { createBlock };
