@@ -11,11 +11,11 @@ test("can create a new page", async ({ page }) => {
 test("can create a new event", async ({ page }) => {
   expect(await createContentType(page, "event", {
     Title: "My new event",
-    "In-person": true,
-    "#edit-field-event-date-0-time-wrapper-value-date": new Date(),
-    "#edit-field-event-date-0-time-wrapper-value-time": "12:00 PM",
-    "#edit-field-event-date-0-time-wrapper-end-value-date": new Date(),
-    "#edit-field-event-date-0-time-wrapper-end-value-time": "3:00 PM",
+    "Event type": "In-person",
+    "Start date": new Date(),
+    "Start time": "12:00 PM",
+    "End date": new Date(),
+    "End time": "3:00 PM",
   })).toBe(true);
   expect(await page.title()).toBe("Edit layout for My new event | YaleSites");
 });
