@@ -38,8 +38,11 @@ async function createContentType(
   page: Page,
   pageType: PageType,
   opts: Partial<ContentTypeOptions[PageType]>,
+  before: Function = (_page) => { },
 ) {
   await page.goto("/node/add/" + pageType);
+
+  before(page);
 
   try {
     // For each item inside of pageType, loop through and set each value.
