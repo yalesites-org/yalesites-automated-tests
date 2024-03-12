@@ -27,10 +27,20 @@ interface ContentTypeOptions {
   },
 };
 
+/*
+ * Convert the options to the right format for the event content type
+ *
+ * @param opts - the options to convert
+ *
+ * @returns the converted options
+ * 
+ * @example
+ * toEventHash({ Title: "My new event", "Event type": "In-person", "Start date": new Date(), "Start time": "12:00 PM", "End date": new Date(), "End time": "3:00 PM" })
+ */
 function toEventHash(opts: Partial<ContentTypeOptions["event"]>): Partial<ContentTypeOptions["event"]> {
-  // Make a copy of opts.
   let hash = { ...opts };
 
+  // The selects that need to be converted to a { value: true }
   const selects = ["event_type", "Event type"]
 
   // Loop through selects and convert to the right value
