@@ -27,6 +27,41 @@ interface ContentTypeOptions {
   },
 };
 
+function toEventHash(opts: Partial<ContentTypeOptions["event"]>): Partial<ContentTypeOptions["event"]> {
+  // Make a copy of opts.
+  let hash = { ...opts };
+
+  const selects = ["event_type", "Event type"]
+
+  // Loop through selects and convert to the right value
+  for (let key of selects) {
+    if (hash[key]) {
+      hash[hash[key]] = true;
+      delete hash[key];
+    }
+  }
+
+  // Possibilites of referencing these items
+  const renames = {
+    "start_date": "#edit-field-event-date-0-time-wrapper-value-date",
+    "Start date": "#edit-field-event-date-0-time-wrapper-value-date",
+    "start_time": "#edit-field-event-date-0-time-wrapper-value-time",
+    "Start time": "#edit-field-event-date-0-time-wrapper-value-time",
+    "end_date": "#edit-field-event-date-0-time-wrapper-end-value-date",
+    "End date": "#edit-field-event-date-0-time-wrapper-end-value-date",
+    "end_time": "#edit-field-event-date-0-time-wrapper-end-value-time",
+    "End time": "#edit-field-event-date-0-time-wrapper-end-value-time",
+  }
+
+  for (let [key, value] of Object.entries(renames)) {
+    if (hash[key]) {
+      hash[value] = hash[key];
+      delete hash[key];
+    }
+  }
+
+  return hash;
+}
 
 /*
  * Create a new page content type
@@ -38,15 +73,21 @@ async function createContentType(
   page: Page,
   pageType: PageType,
   opts: Partial<ContentTypeOptions[PageType]>,
-  before: Function = (_page) => { },
+  before: Function = (_page: Page) => { },
 ) {
   await page.goto("/node/add/" + pageType);
 
   before(page);
 
+  let modifiedOpts = opts;
+
+  if (pageType === "event") {
+    modifiedOpts = toEventHash(opts);
+  }
+
   try {
     // For each item inside of pageType, loop through and set each value.
-    for (let [key, value] of Object.entries(opts)) {
+    for (let [key, value] of Object.entries(modifiedOpts)) {
       let method = "fill";
       // Check if value is actually the boolean true or false
       if (value === true) {
