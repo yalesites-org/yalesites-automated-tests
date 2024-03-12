@@ -35,8 +35,12 @@ const runTests = () => {
     await expect(page).toHaveTitle("Edit layout for Test Event | YaleSites");
   });
 
-  test("Create a new profile content type", async ({ page }) => {
+  test("Create a new profile content type", async ({ page, isMobile }) => {
     await page.goto("/node/add/profile");
+
+    if (isMobile) {
+      await page.getByRole('button', { name: 'General info' }).click();
+    }
 
     await page.getByLabel('First Name', { exact: true }).fill('Test');
     await page.getByLabel('Last Name', { exact: true }).fill('User');
