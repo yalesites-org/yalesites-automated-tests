@@ -21,8 +21,8 @@ interface ContentTypeOptions {
     [key: string]: any;
   },
   profile: {
-    first_name: string;
-    last_name: string;
+    "First name": string;
+    "Last name": string;
     [key: string]: any;
   },
 };
@@ -62,14 +62,16 @@ async function createContentType(
       let element = null;
       // Can support selectors or just text to get the input
       if (!key.match(/^[#.]/)) {
-        // For some reason, the required asterisk is sometimes used as part of
-        // the label, and so it doesn't properly match.  This ensures that we
-        // cover that situation so that we can consitently get the right input.
-        const regex = new RegExp(`${key}(?: \\*)?`);
-
-        element = page.getByLabel(regex);
+        element = page.getByLabel(key);
       } else {
         element = page.locator(key);
+      }
+
+      // Try to always pick the first one if we still can't pinpoint the right one.
+      // But we'll let the users know they need to address it.
+      if (element['first'] !== undefined) {
+        console.warn(`Multiple elements found for ${key}.  Using the first one.`);
+        element = element.first();
       }
 
       await element[method](value);
@@ -77,6 +79,7 @@ async function createContentType(
 
     await page.getByRole('button', { name: 'Save' }).click();
   } catch (err) {
+    console.log(err);
     return false;
   }
 

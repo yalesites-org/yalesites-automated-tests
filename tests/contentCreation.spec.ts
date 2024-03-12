@@ -24,3 +24,8 @@ test("can create a post", async ({ page }) => {
   expect(await createContentType(page, "post", { Title: "My new post", "Teaser Title": "Hi" })).toBe(true);
   expect(await page.title()).toBe("Edit layout for My new post | YaleSites");
 });
+
+test("can create a profile", async ({ page }) => {
+  expect(await createContentType(page, "profile", { "First name": "John", "Last name": "Doe" })).toBe(true);
+  expect(await page.title()).toBe("Edit layout for John Doe | YaleSites");
+});
