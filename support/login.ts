@@ -26,7 +26,7 @@ function getLoginUrl(options: LoginOptions): string {
   let cmd = LOCAL_CMD;
   let opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
 
-  cmd = cmd + ` ${user}`;
+  cmd = cmd + ` --name=${user}`;
   cmd = cmd.replace("{DRUSH_OPTS}", "user:login");
 
   try {
@@ -62,8 +62,9 @@ function doesUserExist(drupalPath: string, username: string) {
  * @returns true if the user was created, false if not
  */
 function createUser(drupalPath: string, username: string) {
+  const password = `${username}1234!`;
   const opts: ExecSyncOptions = { cwd: drupalPath, stdio: "pipe" };
-  const cmd = `lando drush user:create ${username}`;
+  const cmd = `lando drush user:create ${username} --mail='${username}@noreply.yale.edu' --password='${password}'`;
   try {
     execSync(cmd, opts);
     return true;
