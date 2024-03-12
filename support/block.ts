@@ -115,7 +115,7 @@ interface Block {
 
 const createBlock = async (page: Page, blockType: BlockType, block: Partial<Block[BlockType]>) => {
   // Convert to human readable block type name.
-  const blockTypeLabel = blockType.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const blockTypeLabel = humanize(blockType)
 
   await page.getByRole('link', { name: 'Add block in Content Section' }).last().click({ force: true });
   await page.waitForSelector('text=Choose a block');
