@@ -15,7 +15,7 @@ test("can create a new text block", async ({ page, isMobile }) => {
     })).toBe(true);
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     expect(await page.title()).toBe("My new page | YaleSites");
-    expect(await page.locator('p').innerText()).toBe('This is a test');
+    expect(page.getByRole('paragraph')).toHaveText('This is a test');
   } else {
     test.skip();
   }
@@ -28,18 +28,18 @@ test("can create a new quick links block", async ({ page, isMobile }) => {
       administrative_label: "My new quick links block",
       quick_links_component_title: "Quick Links",
       quick_links: [
-        { url: "https://yalesites.yale.edu", link_text: "YaleSites" },
-        { url: "https://yale.edu", link_text: "Yale" },
-        { url: "https://yale.edu", link_text: "Another Yale" },
+        { url: "https://yalesites.yale.edu", link_text: "YaleSites main page" },
+        { url: "https://google.com", link_text: "Google" },
+        { url: "https://yahoo.com", link_text: "Yahoo" },
       ],
       reusable_block: false,
     })).toBe(true);
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page).toHaveTitle("My new quick links page | YaleSites");
-    await expect(page.locator('h2')).toHaveText('Quick Links');
-    await expect(page.getByRole('link', { name: 'YaleSites' })).toHaveAttribute('href', 'https://yalesites.yale.edu');
-    await expect(page.getByRole('link', { name: 'Yale' })).toHaveAttribute('href', 'https://yale.edu');
-    await expect(page.getByRole('link', { name: 'Another Yale' })).toHaveAttribute('href', 'https://yale.edu');
+    await expect(page.getByRole('heading', { name: 'Quick Links', exact: true })).toHaveText('Quick Links');
+    await expect(page.getByRole('link', { name: 'YaleSites main page' })).toHaveAttribute('href', 'https://yalesites.yale.edu');
+    await expect(page.getByRole('link', { name: 'Google' })).toHaveAttribute('href', 'https://google.com');
+    await expect(page.getByRole('link', { name: 'Yahoo' })).toHaveAttribute('href', 'https://yahoo.com');
   } else {
     test.skip();
   }
