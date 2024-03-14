@@ -1,24 +1,38 @@
 # YaleSites Automated Tests
 
-## Admin test setup
+End to end testing for Yalesites Project.
 
-To test as an admin, you'll need to either specify a local directory with yalesites or a remote pantheon location to test against.
+## Installation
 
-### Local path
-
-Set an environment variable named YALESITES_PROJECT_PATH to the absolute location of the yalesites repo you have running locally.
-
-### Remote pantheon site
-
-Set the YALESITES_PROJECT_PATH to the terminus server name to attempt to get admin credentials from.
+```bash
+gh repo clone yale-org/yalesites-automated-tests
+cd yalesites-automated-tests
+npm i -D
+npx playwright install
+```
 
 ## Usage
 
 ```bash
-YALESITES_PROJECT_PATH="remotesite.dev" npx playwright test
+YALESITES_URL="http://yalesites.domain" npm run test
 ```
 
 or for a UI
 ```bash
-YALESITES_PROJECT_PATH="remotesite.dev" npx playwright test --ui
+YALESITES_URL="http://yalesites.domain" npm run ui
 ```
+
+or for debugging a test
+```bash
+YALESITES_URL="http://yalesites.domain" npm run debug
+```
+
+### Command line reporter
+
+If you prefer to run with the command line reporter while you develop, you can
+use the following:
+```bash
+YALESITES_URL="http://yalesites.domain" npm run dev
+```
+
+The above command defaults to the line reporter over the HTML reporter.

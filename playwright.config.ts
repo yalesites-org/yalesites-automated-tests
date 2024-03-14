@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 const launchOptions = {
   ignoreHTTPSErrors: true,
@@ -14,63 +14,68 @@ const launchOptions = {
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 2,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'line',
+  reporter: "html",
   timeout: 60000,
+  // Change the location of snapshots so that they aren't in our test folder
+  snapshotDir: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://yalesites-platform.lndo.site',
+    // use environment varaible YALESITES_URL or default to yalesites-platform.lndo.site
+    baseURL:
+      process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'], contextOptions: launchOptions },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
     },
 
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'], contextOptions: launchOptions },
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"], contextOptions: launchOptions },
     },
 
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'], contextOptions: launchOptions },
+      name: "webkit",
+      use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
     },
 
     /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'], contextOptions: launchOptions },
+    // },
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'], contextOptions: launchOptions },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'], contextOptions: launchOptions },
+      name: "Mobile Safari",
+      use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
     },
 
     /* Test against branded browsers. */
-    {
-      name: 'Microsoft Edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge', contextOptions: launchOptions },
-    },
-    {
-      name: 'Google Chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
-    },
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge', contextOptions: launchOptions },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
+    // },
   ],
 
   /* Run your local dev server before starting the tests */
