@@ -8,6 +8,7 @@ End to end testing for Yalesites Project.
 gh repo clone yale-org/yalesites-automated-tests
 cd yalesites-automated-tests
 npm i -D
+npx playwright install
 ```
 
 ## Usage
