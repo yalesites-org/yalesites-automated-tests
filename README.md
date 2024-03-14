@@ -29,9 +29,12 @@ YALESITES_URL="http://yalesites.domain" npm run debug
 
 ### Developing new tests
 
-If you prefer to run with the command line reporter, you can use the following:
+If you prefer to run with the command line reporter while you develop, you can
+use the following:
 ```bash
 YALESITES_URL="http://yalesites.domain" npm run dev
 ```
 
-The above command defaults to the line reporter.
+The above command defaults to the line reporter over the HTML reporter.  When
+developing tests, you might get annoyed with having to CTRL-C the HTML report
+server each time.
