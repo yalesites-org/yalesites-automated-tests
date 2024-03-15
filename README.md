@@ -14,17 +14,17 @@ npx playwright install
 ## Usage
 
 ```bash
-YALESITES_URL="http://yalesites.domain" npm run test
+YALESITES_URL="https://yalesites.domain" npm run test
 ```
 
 or for a UI
 ```bash
-YALESITES_URL="http://yalesites.domain" npm run ui
+YALESITES_URL="https://yalesites.domain" npm run ui
 ```
 
 or for debugging a test
 ```bash
-YALESITES_URL="http://yalesites.domain" npm run debug
+YALESITES_URL="https://yalesites.domain" npm run debug
 ```
 
 ### Command line reporter
@@ -32,7 +32,7 @@ YALESITES_URL="http://yalesites.domain" npm run debug
 If you prefer to run with the command line reporter while you develop, you can
 use the following:
 ```bash
-YALESITES_URL="http://yalesites.domain" npm run dev
+YALESITES_URL="https://yalesites.domain" npm run dev
 ```
 
 The above command defaults to the line reporter over the HTML reporter.

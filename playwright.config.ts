@@ -27,7 +27,7 @@ export default defineConfig({
   reporter: "html",
   timeout: 60000,
   // Change the location of snapshots so that they aren't in our test folder
-  snapshotPathTemplate: "./snapshots/{testFilePath}/{arg}{ext}",
+  snapshotDir: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
