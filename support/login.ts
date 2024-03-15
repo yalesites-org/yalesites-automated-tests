@@ -33,7 +33,7 @@ function getLoginUrl(options: LoginOptions): string {
     const stdout = execSync(cmd, opts);
     return stdout.toString().trim();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return null;
   }
 }
@@ -100,6 +100,7 @@ function assignRoles(
 function ensureLoggedIn(user: string, roles: Array<string>, drupalPath: string) {
   if (!doesUserExist(drupalPath, user)) {
     createUser(drupalPath, user);
+  } else {
   }
 
   assignRoles(drupalPath, user, roles);

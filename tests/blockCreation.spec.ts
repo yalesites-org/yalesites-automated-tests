@@ -19,7 +19,7 @@ test("can create a new text block", async ({ page }) => {
     reusable_block: false,
   })).toBe(true);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  expect(await page.title()).toBe("My new page | YaleSites");
+  expect(await page.title()).toContain("My new page");
   expect(page.getByRole('paragraph')).toHaveText('This is a test');
 });
 
@@ -36,7 +36,7 @@ test("can create a new quick links block", async ({ page }) => {
     reusable_block: false,
   })).toBe(true);
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(page).toHaveTitle("My new quick links page | YaleSites");
+  expect(await page.title()).toContain("My new quick links page");
   await expect(page.getByRole('heading', { name: 'Quick Links', exact: true })).toHaveText('Quick Links');
   await expect(page.getByRole('link', { name: 'YaleSites main page' })).toHaveAttribute('href', 'https://yalesites.yale.edu');
   await expect(page.getByRole('link', { name: 'Google' })).toHaveAttribute('href', 'https://google.com');

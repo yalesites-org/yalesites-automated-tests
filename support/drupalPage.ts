@@ -118,7 +118,7 @@ async function createContentType(
 
     await page.getByRole('button', { name: 'Save' }).click();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return false;
   }
 
@@ -179,7 +179,6 @@ function toMilitaryTime(time: String) {
     hour = `0${hour}`;
   }
 
-  console.log(`${hour}:${minute}`);
   return `${hour}:${minute}`;
 }
 

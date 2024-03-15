@@ -299,8 +299,6 @@ const humanize = (str: string) => {
 const fillAny = async (element: Locator, value: any) => {
   const tagName = await element.evaluate(node => node.tagName);
   const type = await element.evaluate(node => node.getAttribute('type'));
-  console.log('tagName', tagName);
-  console.log('type', type);
 
   if (value === true || value === false) {
     await element.setChecked(value);

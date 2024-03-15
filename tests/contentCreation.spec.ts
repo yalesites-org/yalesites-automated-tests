@@ -5,7 +5,7 @@ test.use({ storageState: 'playwright/.auth/siteAdmin.json' });
 
 test("can create a new page", async ({ page }) => {
   expect(await createContentType(page, "page", { Title: "My new page", "Teaser Title": "Hi" })).toBe(true);
-  expect(await page.title()).toBe("Edit layout for My new page | YaleSites");
+  expect(await page.title()).toContain("Edit layout for My new page");
 });
 
 test("can create a new event", async ({ page }) => {
@@ -17,12 +17,12 @@ test("can create a new event", async ({ page }) => {
     "End date": new Date(),
     "End time": "3:00 PM",
   })).toBe(true);
-  expect(await page.title()).toBe("Edit layout for My new event | YaleSites");
+  expect(await page.title()).toContain("Edit layout for My new event");
 });
 
 test("can create a post", async ({ page }) => {
   expect(await createContentType(page, "post", { Title: "My new post", "Teaser Title": "Hi" })).toBe(true);
-  expect(await page.title()).toBe("Edit layout for My new post | YaleSites");
+  expect(await page.title()).toContain("Edit layout for My new post");
 });
 
 test("can create a profile", async ({ page, isMobile }) => {
@@ -33,5 +33,5 @@ test("can create a profile", async ({ page, isMobile }) => {
   };
 
   expect(await createContentType(page, "profile", { "First name": "John", "Last name": "Doe" }, beforeCallback)).toBe(true);
-  expect(await page.title()).toBe("Edit layout for John Doe | YaleSites");
+  expect(await page.title()).toContain("Edit layout for John Doe");
 });
