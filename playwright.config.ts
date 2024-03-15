@@ -22,10 +22,10 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 2,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : 1,
+  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "line",
-  timeout: 60000,
+  // timeout: 60000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

@@ -42,3 +42,14 @@ test("can create a new quick links block", async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Google' })).toHaveAttribute('href', 'https://google.com');
   await expect(page.getByRole('link', { name: 'Yahoo' })).toHaveAttribute('href', 'https://yahoo.com');
 });
+
+test("can create an image block", async ({ page }) => {
+  expect(await createContentType(page, "page", { Title: "My new image page" })).toBe(true);
+  expect(await createBlock(page, "image", {
+    administrative_label: "My new image block",
+    image: "https://via.placeholder.com/150",
+    image_caption: "A placeholder image",
+    reusable_block: false,
+  })).toBe(true);
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+});

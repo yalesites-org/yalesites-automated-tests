@@ -253,6 +253,7 @@ const fillInFormElement = async (
   } else if (value instanceof Object) {
     await fillInForm(page, value, 0);
   } else {
+    let elementType = 'input';
     let label = humanize(key);
     // If label contains content, rename it to target
     // 'Editor editing area: main'
@@ -260,8 +261,13 @@ const fillInFormElement = async (
       label = 'Editor editing area: main';
     }
 
+    if (["Image", "Media"].includes(label)) {
+      label = "Add media";
+      elementType = 'button';
+    }
+
     const regex = new RegExp(label, 'i');
-    const element = page.getByLabel(regex).nth(index);
+    const element = elementType === 'input' ? page.getByLabel(regex).nth(index) : page.getByRole(elementType, { name: regex }).nth(index);
     await fillAny(element, value);
   }
 };
@@ -277,24 +283,40 @@ const fillInFormElement = async (
  *
  * humanize("quick_links") // "Quick Links"
  * humanize("quick_links_component_title") // "Quick Links Component Title"
+ * humanize("image") // "Image"
  */
 const humanize = (str: string) => {
-  return str
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  if (str.includes('_')) {
+    return str
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 const fillAny = async (element: Locator, value: any) => {
   const tagName = await element.evaluate(node => node.tagName);
+  const type = await element.evaluate(node => node.getAttribute('type'));
+  console.log('tagName', tagName);
+  console.log('type', type);
 
   if (value === true || value === false) {
     await element.setChecked(value);
   } else if (tagName === 'SELECT') {
     await element.selectOption(value);
+  } else if (type === "submit") {
+    await selectMediaItem(element, value);
   } else {
     await element.fill(value);
   }
 }
+
+const selectMediaItem = async (element: Locator, value: string) => {
+  const page = element.page();
+  await element.click();
+  await page.waitForSelector("body");
+};
 
 export { createBlock };
