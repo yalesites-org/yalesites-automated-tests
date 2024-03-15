@@ -27,7 +27,7 @@ export default defineConfig({
   reporter: "line",
   // timeout: 60000,
   // Change the location of snapshots so that they aren't in our test folder
-  snapshotDir: "./snapshots",
+  snapshotPathTemplate: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -37,6 +37,16 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+  },
+
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.17,
+      animations: "disabled",
+    },
+    toMatchSnapshot: {
+      threshold: 0.17,
+    },
   },
 
   /* Configure projects for major browsers */

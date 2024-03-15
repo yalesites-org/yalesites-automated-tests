@@ -22,8 +22,6 @@ const testScreenshotForPage = (pagePath: string) => {
     await page.goto(url);
     await expect(page).toHaveScreenshot({
       fullPage: true,
-      maxDiffPixelRatio: 0.17,
-      animations: "disabled",
     });
   });
 };

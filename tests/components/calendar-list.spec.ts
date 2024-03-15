@@ -78,7 +78,7 @@ test.skip("can use keyboard to select Staff from the drop down and apply", async
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
+  await expect(page).toHaveScreenshot({ fullPage: true });
 });
 
 test("should pass axe", async ({ page }) => {

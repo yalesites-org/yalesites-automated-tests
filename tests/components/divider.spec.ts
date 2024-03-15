@@ -14,7 +14,7 @@ test("exists on the page", async ({ page }) => {
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
+  await expect(page).toHaveScreenshot({ fullPage: true });
 });
 
 test("should pass axe", async ({ page }) => {
