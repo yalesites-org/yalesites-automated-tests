@@ -268,6 +268,8 @@ const fillInFormElement = async (
       "Caption",
       "Image Caption",
       "Video Description",
+      "Quote",
+      "Attribution",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'

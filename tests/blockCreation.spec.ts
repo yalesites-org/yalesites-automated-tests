@@ -89,6 +89,25 @@ test("can create a wrapped image block", async ({ page }) => {
   expect(await page.title()).toContain("My new wrapped image page");
 });
 
+test("can create a quote block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new quote page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "quote", {
+      administrative_label: "My new quote block",
+      quote: "This is a test quote",
+      attribution: "Anonymous",
+      style: "Bar Left",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new quote page");
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),
