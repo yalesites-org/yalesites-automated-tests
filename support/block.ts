@@ -248,12 +248,27 @@ const fillInFormElement = async (
   index: number = 0,
 ) => {
   if (value instanceof Array) {
+    // And if we have an "Add another item" button.
+    const addAnotherButtonExists = await page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),
+      )
+        .map((el) => el.value)
+        .includes("Add another item"),
+    );
+
     for (let index = 0; index < value.length; index++) {
       await fillInForm(page, value[index], index);
-      // Click the "Add another item" button if it's not the last one.
-      if (index !== value.length - 1) {
-        await page.getByRole("button", { name: "Add another item" }).click();
-      }
+      try {
+        // Click the "Add another item" button if it's not the last one
+        if (index !== value.length - 1) {
+          if (addAnotherButtonExists === true) {
+            await page
+              .getByRole("button", { name: "Add another item" })
+              .click();
+          }
+        }
+      } catch (e) {}
     }
   } else if (value instanceof Object) {
     await fillInForm(page, value, 0);
