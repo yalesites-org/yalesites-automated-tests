@@ -178,7 +178,8 @@ const createBlock = async (
   await layoutBuilderModal
     .getByRole("link", { name: blockTypeLabel })
     .first()
-    .click();
+    .click({ force: true });
+  await page.waitForLoadState("networkidle");
 
   await fillInForm(page, block);
 
@@ -259,13 +260,28 @@ const fillInFormElement = async (
   } else {
     let elementType = "input";
     let label = humanize(key);
+
+    let context: Page | Locator = page;
+
+    const ckEditorLabels = [
+      "Content",
+      "Caption",
+      "Image Caption",
+      "Video Description",
+    ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'
-    if (label.includes("Content") || label.includes("Caption")) {
+    if (ckEditorLabels.includes(label)) {
+      // I don't like targeting this but it's the only way to target via the
+      // wrapper.
+      context = context.locator("div.glb-form-textarea-wrapper", {
+        has: page.getByLabel(label, { exact: true }) as Locator,
+      });
       label = "Editor editing area: main";
     }
 
-    if (["Image", "Media"].includes(label)) {
+    const mediaLabels = ["Image", "Media", "Video"];
+    if (mediaLabels.includes(label)) {
       label = "Add media";
       elementType = "button";
     }
@@ -273,8 +289,10 @@ const fillInFormElement = async (
     const regex = new RegExp(label, "i");
     const element =
       elementType === "input"
-        ? page.getByLabel(regex).nth(index)
-        : page.getByRole(elementType as AriaRole, { name: regex }).nth(index);
+        ? context.getByLabel(regex).nth(index)
+        : context
+            .getByRole(elementType as AriaRole, { name: regex })
+            .nth(index);
     await fillAny(element, value);
   }
 };
@@ -303,6 +321,14 @@ const humanize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+/**
+ * Fill in any element
+ * @param element - the element to fill in
+ * @param value - the value to fill in
+ * @returns void
+ * @example
+ * fillAny(page.getByLabel("Title"), "My new page");
+ */
 const fillAny = async (element: Locator, value: any) => {
   const tagName = await element.evaluate((node) => node.tagName);
   const type = await element.evaluate((node) => node.getAttribute("type"));
@@ -326,7 +352,7 @@ const selectOrUploadMediaItem = async (element: Locator, value: string) => {
   return await selectMediaItem(element, value);
 };
 
-const uploadMediaItem = async (element: Locator, value: string) => {
+const uploadMediaItem = async (_element: Locator, _value: string) => {
   console.log("I should be uploading a document now.  But I'm not.");
 };
 

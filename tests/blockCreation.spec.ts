@@ -27,6 +27,68 @@ test("can create a new text block", async ({ page }) => {
   expect(page.getByRole("paragraph")).toHaveText("This is a test");
 });
 
+test("can create an image block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new image page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "image", {
+      administrative_label: "My new image block",
+      image: "jester",
+      image_caption: "A placeholder image",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+
+  expect(await page.title()).toContain("My new image page");
+});
+
+test("can create a video block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new video page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "video", {
+      administrative_label: "My new video block",
+      video_component_title: "Video",
+      video_description: "A placeholder video",
+      video: "What is Drupal",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+
+  expect(await page.title()).toContain("My new video page");
+});
+
+test("can create a wrapped image block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new wrapped image page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "wrapped_image", {
+      administrative_label: "My new wrapped image block",
+      content: "My content goes here",
+      caption: "A placeholder image",
+      position: "Image Left",
+      style: "Inline",
+      reusable_block: false,
+      image: "jester",
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new wrapped image page");
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),
@@ -59,23 +121,4 @@ test("can create a new quick links block", async ({ page }) => {
     "href",
     "https://yahoo.com",
   );
-});
-
-test("can create an image block", async ({ page }) => {
-  expect(
-    await createContentType(page, "page", { Title: "My new image page" }),
-  ).toBe(true);
-  expect(
-    await createBlock(page, "image", {
-      administrative_label: "My new image block",
-      image: "jester",
-      image_caption: "A placeholder image",
-      reusable_block: false,
-    }),
-  ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
-
-  expect(await page.title()).toContain("My new image page");
 });
