@@ -1,6 +1,7 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator, AriaRole } from "@playwright/test";
 
-type BlockType = "text"
+type BlockType =
+  | "text"
   | "image"
   | "video"
   | "wrapped_image"
@@ -19,14 +20,14 @@ interface Block {
     text_style_variation: "Default" | "Emphasized";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   image: {
     administrative_label: string;
     image: string;
     image_caption: string;
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   video: {
     administrative_label: string;
     video_component_title: string;
@@ -34,7 +35,7 @@ interface Block {
     video: string;
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   wrapped_image: {
     administrative_label: string;
     content?: string;
@@ -44,7 +45,7 @@ interface Block {
     offset: "Offset" | "Inline";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   quote: {
     administrative_label: string;
     quote: string;
@@ -52,7 +53,7 @@ interface Block {
     style: "Bar Left" | "Bar Right" | "Quote Left";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   button_link: {
     administrative_label: string;
     button_links: {
@@ -61,7 +62,7 @@ interface Block {
     }[];
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   callout: {
     administrative_label: string;
     callout_items: {
@@ -76,14 +77,14 @@ interface Block {
     background_color: "One" | "Two" | "Three";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   divider: {
     administrative_label: string;
     divider_position: "Left" | "Center";
     divider_width: "100" | "75" | "50" | "25";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   spotlight_landscape: {
     administrative_label: string;
     image: string;
@@ -100,7 +101,7 @@ interface Block {
     focus: "Equal Focus" | "Image Focus";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   spotlight_portrait: {
     administrative_label: string;
     image: string;
@@ -116,7 +117,7 @@ interface Block {
     image_style: "Inline" | "Offset";
     reusable_block: boolean;
     [key: string]: any;
-  },
+  };
   quick_links: {
     administrative_label: string;
     quick_links_component_title: string;
@@ -128,8 +129,8 @@ interface Block {
     image: string;
     reusable_block: boolean;
     [key: string]: any;
-  },
-};
+  };
+}
 
 /*
  * Create a block
@@ -164,23 +165,24 @@ interface Block {
 const createBlock = async (
   page: Page,
   blockType: BlockType,
-  block: Partial<Block[BlockType]>) => {
-  const blockTypeLabel = humanize(blockType)
+  block: Partial<Block[BlockType]>,
+) => {
+  const blockTypeLabel = humanize(blockType);
 
   await page
-    .getByRole('link', { name: 'Add block in Content Section' })
+    .getByRole("link", { name: "Add block in Content Section" })
     .last()
     .click({ force: true });
   // Would love to not have to use locator here.  Fix if you can.
-  const layoutBuilderModal = page.locator('div#layout-builder-modal');
+  const layoutBuilderModal = page.locator("div#layout-builder-modal");
   await layoutBuilderModal
-    .getByRole('link', { name: blockTypeLabel })
+    .getByRole("link", { name: blockTypeLabel })
     .first()
     .click();
 
   await fillInForm(page, block);
 
-  await page.getByRole('button', { name: 'Add block' }).click({ force: true });
+  await page.getByRole("button", { name: "Add block" }).click({ force: true });
 
   return true;
 };
@@ -204,11 +206,12 @@ const createBlock = async (
 const fillInForm = async (
   page: Page,
   elements: { [key: string]: any },
-  index: number = 0) => {
+  index: number = 0,
+) => {
   for (const key in elements) {
     await fillInFormElement(page, key, elements[key], index);
   }
-}
+};
 
 /*
  * Fill in a form element
@@ -241,33 +244,37 @@ const fillInFormElement = async (
   page: Page,
   key: string,
   value: any,
-  index: number = 0) => {
+  index: number = 0,
+) => {
   if (value instanceof Array) {
     for (let index = 0; index < value.length; index++) {
       await fillInForm(page, value[index], index);
       // Click the "Add another item" button if it's not the last one.
-      if (index !== (value.length - 1)) {
-        await page.getByRole('button', { name: 'Add another item' }).click();
+      if (index !== value.length - 1) {
+        await page.getByRole("button", { name: "Add another item" }).click();
       }
     }
   } else if (value instanceof Object) {
     await fillInForm(page, value, 0);
   } else {
-    let elementType = 'input';
+    let elementType = "input";
     let label = humanize(key);
     // If label contains content, rename it to target
     // 'Editor editing area: main'
-    if (label.includes('Content')) {
-      label = 'Editor editing area: main';
+    if (label.includes("Content") || label.includes("Caption")) {
+      label = "Editor editing area: main";
     }
 
     if (["Image", "Media"].includes(label)) {
       label = "Add media";
-      elementType = 'button';
+      elementType = "button";
     }
 
-    const regex = new RegExp(label, 'i');
-    const element = elementType === 'input' ? page.getByLabel(regex).nth(index) : page.getByRole(elementType, { name: regex }).nth(index);
+    const regex = new RegExp(label, "i");
+    const element =
+      elementType === "input"
+        ? page.getByLabel(regex).nth(index)
+        : page.getByRole(elementType as AriaRole, { name: regex }).nth(index);
     await fillAny(element, value);
   }
 };
@@ -286,35 +293,54 @@ const fillInFormElement = async (
  * humanize("image") // "Image"
  */
 const humanize = (str: string) => {
-  if (str.includes('_')) {
+  if (str.includes("_")) {
     return str
-      .split('_')
+      .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .join(" ");
   }
 
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 const fillAny = async (element: Locator, value: any) => {
-  const tagName = await element.evaluate(node => node.tagName);
-  const type = await element.evaluate(node => node.getAttribute('type'));
+  const tagName = await element.evaluate((node) => node.tagName);
+  const type = await element.evaluate((node) => node.getAttribute("type"));
 
   if (value === true || value === false) {
     await element.setChecked(value);
-  } else if (tagName === 'SELECT') {
+  } else if (tagName === "SELECT") {
     await element.selectOption(value);
   } else if (type === "submit") {
-    await selectMediaItem(element, value);
+    await selectOrUploadMediaItem(element, value);
   } else {
     await element.fill(value);
   }
-}
+};
+
+const selectOrUploadMediaItem = async (element: Locator, value: string) => {
+  if (value.match(/^https?:\/\//)) {
+    return await uploadMediaItem(element, value);
+  }
+
+  return await selectMediaItem(element, value);
+};
+
+const uploadMediaItem = async (element: Locator, value: string) => {
+  console.log("I should be uploading a document now.  But I'm not.");
+};
 
 const selectMediaItem = async (element: Locator, value: string) => {
   const page = element.page();
   await element.click();
-  await page.waitForSelector("body");
+  await page.getByRole("button", { name: "Add media" }).click({ force: true });
+  await page.getByLabel("Name").click();
+  await page.getByLabel("Name").fill(value);
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await page.getByRole("checkbox").nth(2).check();
+  await page.getByRole("button", { name: "Insert selected" }).click();
+  // Need this to get past insert selected click for some reason
+  await page.waitForLoadState("networkidle");
 };
 
 export { createBlock };
