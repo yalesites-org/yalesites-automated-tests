@@ -108,6 +108,35 @@ test("can create a quote block", async ({ page }) => {
   expect(await page.title()).toContain("My new quote page");
 });
 
+test("can create a button link block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new button link page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "button_link", {
+      administrative_label: "My new button link block",
+      button_links: [
+        {
+          url: "https://duckduckgo.com",
+          link_text: "Duck Duck Go",
+        },
+        {
+          url: "https://google.com",
+          link_text: "Google",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new button link page");
+  await expect(
+    page.getByRole("link", { name: "Duck Duck Go" }),
+  ).toHaveAttribute("href", "https://duckduckgo.com");
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),
