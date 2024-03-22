@@ -244,6 +244,42 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
+  // TODO: Do more with this
+  view: {
+    administrative_label: string;
+    view_heading: string;
+    i_want_to_show: "Posts" | "Events" | "Pages" | "Profiles";
+    include_content_that_uses_the_following_items: string;
+    exclude_content_that_uses_the_following_items: string;
+    match_content_that_has:
+      | "Can have any term listed in tags and categories"
+      | "Must have all terms listed in tags and categories";
+    sorting_by: "Publish Date - newer first" | "Publish Date - older first";
+    number_of_items_to_display:
+      | "Display all items"
+      | "Limit to"
+      | "Pagination after";
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  // TODO: Do more with this
+  pre_built_form: {
+    administrative_label: string;
+    form: "Contact";
+    status: "Open" | "Closed" | "Scheduled";
+    pre_built_form_component_title: string;
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  tabs: {
+    administrative_label: string;
+    tabs: {
+      tab_heading: string;
+      content: string;
+    }[];
+    reusable_block: boolean;
+    [key: string]: any;
+  };
 }
 
 // Taken from Playwright since for some reason @playwright/test doesn't have
@@ -462,6 +498,7 @@ const fillInFormElement = async (
         "Add Image Grid Item",
         "Add Accordion Item",
         "Add Custom Card",
+        "Add Tab",
       ];
       const elementValues = Array.from(
         document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),

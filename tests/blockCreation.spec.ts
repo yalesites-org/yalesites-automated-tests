@@ -537,3 +537,32 @@ test("can create a profile directory block", async ({ page }) => {
   expect(await page.title()).toContain("My new profile directory page");
   await expect(page.getByText(/Profile Directory 1/i)).toBeVisible();
 });
+
+test("can create a tab block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new tab page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "tabs", {
+      administrative_label: "My new tab block",
+      tabs: [
+        {
+          tab_heading: "Tab 1",
+          content: "Tab 1 content",
+        },
+        {
+          tab_heading: "Tab 2",
+          content: "Tab 2 content",
+        },
+        {
+          tab_heading: "Tab 3",
+          content: "Tab 3 content",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new tab page");
+  await expect(page.getByRole("tab", { name: /Tab 1/i })).toBeVisible();
+});
