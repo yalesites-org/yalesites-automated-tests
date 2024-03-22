@@ -18,7 +18,8 @@ type BlockType =
   | "spotlight_portrait"
   | "quick_links"
   | "gallery"
-  | "media_grid";
+  | "media_grid"
+  | "accordion";
 
 interface Block {
   text: {
@@ -154,6 +155,18 @@ interface Block {
     image_grid_items: {
       image: string;
     }[];
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  accordion: {
+    administrative_label: string;
+    accordion_component_title: string;
+    accordion_items: {
+      accordion_item_heading: string;
+      content: string;
+    }[];
+    reusable_block: boolean;
+    [key: string]: any;
   };
 }
 
@@ -371,6 +384,7 @@ const fillInFormElement = async (
         "Add Callout Item",
         "Add Gallery Item",
         "Add Image Grid Item",
+        "Add Accordion Item",
       ];
       const elementValues = Array.from(
         document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),

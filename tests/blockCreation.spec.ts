@@ -348,3 +348,32 @@ test("can create a media grid block", async ({ page }) => {
   await page.getByRole("button", { name: "Save", exact: true }).click();
   expect(await page.title()).toContain("My new media grid page");
 });
+
+test("can create an accordion block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new accordion page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "accordion", {
+      administrative_label: "My new accordion block",
+      accordion_component_title: "Accordion",
+      accordion_items: [
+        {
+          accordion_item_heading: "Accordion 1",
+          content: "Accordion 1 content",
+        },
+        {
+          accordion_item_heading: "Accordion 2",
+          content: "Accordion 2 content",
+        },
+        {
+          accordion_item_heading: "Accordion 3",
+          content: "Accordion 3 content",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new accordion page");
+});
