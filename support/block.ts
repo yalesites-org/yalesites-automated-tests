@@ -244,7 +244,7 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
-  // TODO: Do more with this
+  // TODO: Do more with this since it has many states
   view: {
     administrative_label: string;
     view_heading: string;
@@ -262,7 +262,7 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
-  // TODO: Do more with this
+  // TODO: Do more with this as it has optional fields that appear
   pre_built_form: {
     administrative_label: string;
     form: "Contact";
