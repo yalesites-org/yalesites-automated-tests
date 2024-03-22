@@ -175,6 +175,24 @@ test("can create a callout block", async ({ page }) => {
   );
 });
 
+test("can create a divider block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new divider page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "divider", {
+      administrative_label: "My new divider block",
+      divider_position: "Center",
+      divider_width: "50",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new divider page");
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),
