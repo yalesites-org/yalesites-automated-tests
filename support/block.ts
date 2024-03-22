@@ -21,6 +21,7 @@ type BlockType =
   | "media_grid"
   | "accordion"
   | "embed"
+  | "custom_cards"
   | "action_banner"
   | "grand_hero"
   | "post_feed"
@@ -180,6 +181,18 @@ interface Block {
   embed: {
     administrative_label: string;
     embed_external_content: string;
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  custom_cards: {
+    administrative_label: string;
+    custom_cards_component_title: string;
+    cards: {
+      image: string;
+      custom_card_heading: string;
+      custom_card_content: string;
+      link: string;
+    }[];
     reusable_block: boolean;
     [key: string]: any;
   };
@@ -400,6 +413,7 @@ const fillInFormElement = async (
         "Add Gallery Item",
         "Add Image Grid Item",
         "Add Accordion Item",
+        "Add Custom Card",
       ];
       const elementValues = Array.from(
         document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),
@@ -449,6 +463,7 @@ const fillInFormElement = async (
       "Attribution",
       "Callout Content",
       "Gallery Image Caption",
+      "Custom Card Content",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'

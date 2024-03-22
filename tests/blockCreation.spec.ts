@@ -393,3 +393,41 @@ test("can create an embed block", async ({ page }) => {
   await page.getByRole("button", { name: "Save", exact: true }).click();
   expect(await page.title()).toContain("My new embed page");
 });
+
+test("can create a custom card block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new custom card page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "custom_cards", {
+      administrative_label: "My new custom card block",
+      custom_cards_component_title: "Custom Card",
+      cards: [
+        {
+          image: "jester",
+          custom_card_heading: "Custom Card 1",
+          custom_card_content: "This is a test custom card",
+          link: "https://google.com",
+        },
+        {
+          image: "jester",
+          custom_card_heading: "Custom Card 2",
+          custom_card_content: "This is another test custom card",
+          link: "https://yahoo.com",
+        },
+        {
+          image: "jester",
+          custom_card_heading: "Custom Card 3",
+          custom_card_content: "This is yet another test custom card",
+          link: "https://duckduckgo.com",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new custom card page");
+  await expect(
+    page.getByRole("link", { name: /Custom Card 1/i }),
+  ).toHaveAttribute("href", "https://google.com");
+});
