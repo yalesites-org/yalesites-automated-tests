@@ -196,6 +196,21 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
+  action_banner: {
+    administrative_label: string;
+    image: string;
+    action_banner_heading: string;
+    action_banner_content: string;
+    background_color: "One" | "Two" | "Three";
+    layout: "Bottom" | "Left" | "Right";
+    heading_level:
+      | "H2: This page's title is displayed or visually hidden"
+      | "H1: This page's title is hidden";
+    url: string;
+    link_text: string;
+    reusable_block: boolean;
+    [key: string]: any;
+  };
 }
 
 // Taken from Playwright since for some reason @playwright/test doesn't have
@@ -464,6 +479,7 @@ const fillInFormElement = async (
       "Callout Content",
       "Gallery Image Caption",
       "Custom Card Content",
+      "Action Banner Content",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'
@@ -490,6 +506,10 @@ const fillInFormElement = async (
     if (numElements < index + 1) {
       // Let's assume the last one is empty for us
       index = numElements - 1;
+    }
+
+    if (label === "Layout") {
+      elementType = "combobox";
     }
 
     let element = null;

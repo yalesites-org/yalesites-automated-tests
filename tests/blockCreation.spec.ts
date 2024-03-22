@@ -431,3 +431,31 @@ test("can create a custom card block", async ({ page }) => {
     page.getByRole("link", { name: /Custom Card 1/i }),
   ).toHaveAttribute("href", "https://google.com");
 });
+
+test("can create an action banner block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new action banner page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "action_banner", {
+      administrative_label: "My new action banner block",
+      image: "jester",
+      action_banner_heading: "Action Banner",
+      action_banner_content: "This is a test action banner",
+      background_color: "Two",
+      layout: "Left",
+      heading_level: "H2: This page’s title is displayed or visually hidden",
+      url: "https://google.com",
+      link_text: "Google",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new action banner page");
+  await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
+    "href",
+    "https://google.com",
+  );
+});
