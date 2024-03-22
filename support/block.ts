@@ -211,6 +211,21 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
+  grand_hero: {
+    administrative_label: string;
+    media: string;
+    heading: string;
+    text: string;
+    media_size: "Tall" | "Short";
+    url: string;
+    link_text: string;
+    overlay_position: "Full" | "Floating Box";
+    heading_level:
+      | "H1: This page's title is hidden"
+      | "H2: This page's title is displayed or visually hidden";
+    reusable_block: boolean;
+    [key: string]: any;
+  };
 }
 
 // Taken from Playwright since for some reason @playwright/test doesn't have
@@ -480,6 +495,7 @@ const fillInFormElement = async (
       "Gallery Image Caption",
       "Custom Card Content",
       "Action Banner Content",
+      "Text",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'

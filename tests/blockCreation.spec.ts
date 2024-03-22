@@ -459,3 +459,29 @@ test("can create an action banner block", async ({ page }) => {
     "https://google.com",
   );
 });
+
+test("can create a grand hero block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new grand hero page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "grand_hero", {
+      administrative_label: "My new grand hero block",
+      media: "jester",
+      heading: "Grand Hero",
+      text: "This is a test grand hero",
+      media_size: "Short",
+      url: "https://google.com",
+      link_text: "Google",
+      overlay_position: "Floating Box",
+      heading_level: "H2: This page’s title is displayed or visually hidden",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new grand hero page");
+  await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
+    "href",
+    "https://google.com",
+  );
+});
