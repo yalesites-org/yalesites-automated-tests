@@ -1,4 +1,4 @@
-import { type Page, type Locator, AriaRole } from "@playwright/test";
+import { type Page, type Locator } from "@playwright/test";
 
 // Any global timeouts inside of here is this
 // I don't want to use this, but it's the only way to have the DOM updated when
@@ -137,6 +137,97 @@ interface Block {
   };
 }
 
+// Taken from Playwright since for some reason @playwright/test doesn't have
+// this exposed for us?
+type AriaRole =
+  | "alert"
+  | "alertdialog"
+  | "application"
+  | "article"
+  | "banner"
+  | "blockquote"
+  | "button"
+  | "caption"
+  | "cell"
+  | "checkbox"
+  | "code"
+  | "columnheader"
+  | "combobox"
+  | "complementary"
+  | "contentinfo"
+  | "definition"
+  | "deletion"
+  | "dialog"
+  | "directory"
+  | "document"
+  | "emphasis"
+  | "feed"
+  | "figure"
+  | "form"
+  | "generic"
+  | "grid"
+  | "gridcell"
+  | "group"
+  | "heading"
+  | "img"
+  | "insertion"
+  | "link"
+  | "list"
+  | "listbox"
+  | "listitem"
+  | "log"
+  | "main"
+  | "marquee"
+  | "math"
+  | "meter"
+  | "menu"
+  | "menubar"
+  | "menuitem"
+  | "menuitemcheckbox"
+  | "menuitemradio"
+  | "navigation"
+  | "none"
+  | "note"
+  | "option"
+  | "paragraph"
+  | "presentation"
+  | "progressbar"
+  | "radio"
+  | "radiogroup"
+  | "region"
+  | "row"
+  | "rowgroup"
+  | "rowheader"
+  | "scrollbar"
+  | "search"
+  | "searchbox"
+  | "separator"
+  | "slider"
+  | "spinbutton"
+  | "status"
+  | "strong"
+  | "subscript"
+  | "superscript"
+  | "switch"
+  | "tab"
+  | "table"
+  | "tablist"
+  | "tabpanel"
+  | "term"
+  | "textbox"
+  | "time"
+  | "timer"
+  | "toolbar"
+  | "tooltip"
+  | "tree"
+  | "treegrid"
+  | "treeitem";
+
+const blockSearch = {
+  spotlight_landscape: "Spotlight - Landscape",
+  spotlight_portrait: "Spotlight - Portrait",
+};
+
 /*
  * Create a block
  * Note: This assumes you're already logged in and on the page you want to
@@ -172,7 +263,7 @@ const createBlock = async (
   blockType: BlockType,
   block: Partial<Block[BlockType]>,
 ) => {
-  const blockTypeLabel = humanize(blockType);
+  const blockTypeLabel = blockSearch[blockType] || humanize(blockType);
 
   await page
     .getByRole("link", { name: "Add block in Content Section" })

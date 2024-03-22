@@ -193,6 +193,70 @@ test("can create a divider block", async ({ page }) => {
   expect(await page.title()).toContain("My new divider page");
 });
 
+test("can create a spotlight landscape block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new spotlight landscape page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "spotlight_landscape", {
+      administrative_label: "My new spotlight landscape block",
+      image: "jester",
+      heading: "Spotlight Landscape",
+      subheading: "This is a test spotlight landscape",
+      content: "This is a test spotlight landscape",
+      url: "https://google.com",
+      link_text: "Google",
+      theme_color: "Default - No Color",
+      image_position: "Image Left",
+      image_size: "Large",
+      focus: "Equal Focus",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new spotlight landscape page");
+  await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
+    "href",
+    "https://google.com",
+  );
+});
+
+test("can create a spotlight portrait block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new spotlight portrait page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "spotlight_portrait", {
+      administrative_label: "My new spotlight portrait block",
+      image: "jester",
+      heading: "Spotlight Portrait",
+      subheading: "This is a test spotlight portrait",
+      content: "This is a test spotlight portrait",
+      url: "https://google.com",
+      link_text: "Google",
+      theme_color: "Default - No Color",
+      image_position: "Image Left",
+      image_style: "Inline",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.waitForLoadState("networkidle");
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new spotlight portrait page");
+  await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
+    "href",
+    "https://google.com",
+  );
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),
