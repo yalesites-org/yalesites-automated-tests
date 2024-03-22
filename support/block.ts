@@ -19,7 +19,16 @@ type BlockType =
   | "quick_links"
   | "gallery"
   | "media_grid"
-  | "accordion";
+  | "accordion"
+  | "embed"
+  | "action_banner"
+  | "grand_hero"
+  | "post_feed"
+  | "calendar_list"
+  | "profile_directory"
+  | "view"
+  | "pre_built_form"
+  | "tabs";
 
 interface Block {
   text: {
@@ -165,6 +174,12 @@ interface Block {
       accordion_item_heading: string;
       content: string;
     }[];
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  embed: {
+    administrative_label: string;
+    embed_external_content: string;
     reusable_block: boolean;
     [key: string]: any;
   };
@@ -446,7 +461,7 @@ const fillInFormElement = async (
       label = "Editor editing area: main";
     }
 
-    const mediaLabels = ["Image", "Media", "Video"];
+    const mediaLabels = ["Image", "Media", "Video", "Embed External Content"];
     if (mediaLabels.includes(label)) {
       label = "Add media";
       elementType = "button";
@@ -526,6 +541,10 @@ const selectOrUploadMediaItem = async (element: Locator, value: string) => {
     return await uploadMediaItem(element, value);
   }
 
+  if (value.match(/^embed:/)) {
+    return await selectEmbedItem(element, value);
+  }
+
   return await selectMediaItem(element, value);
 };
 
@@ -545,6 +564,30 @@ const selectMediaItem = async (element: Locator, value: string) => {
   await page.getByRole("button", { name: "Insert selected" }).click();
   // Need this to get past insert selected click for some reason
   await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(globalTimeout);
+};
+
+const selectEmbedItem = async (element: Locator, value: string) => {
+  const randomNumber = Math.floor(Math.random() * 10000);
+  const embedValue = value.replace("embed:", "");
+  const page = element.page();
+  await element.click();
+  await page.getByRole("button", { name: "Add media" }).click({ force: true });
+  await page.waitForLoadState("networkidle");
+  await page
+    .getByRole("textbox", { name: "Embed Code or URL" })
+    .fill(embedValue);
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await page.waitForTimeout(globalTimeout);
+  await page.getByLabel("Title", { exact: true }).fill(`Embed ${randomNumber}`);
+  await page
+    .getByLabel("Add or select media")
+    .getByRole("button", { name: "Save" })
+    .click({ force: true });
+  await page.waitForTimeout(globalTimeout);
+  await page
+    .getByRole("button", { name: "Insert selected" })
+    .click({ force: true });
   await page.waitForTimeout(globalTimeout);
 };
 
