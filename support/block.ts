@@ -232,6 +232,12 @@ interface Block {
     reusable_block: boolean;
     [key: string]: any;
   };
+  calendar_list: {
+    administrative_label: string;
+    heading: string;
+    reusable_block: boolean;
+    [key: string]: any;
+  };
 }
 
 // Taken from Playwright since for some reason @playwright/test doesn't have

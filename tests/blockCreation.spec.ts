@@ -501,3 +501,21 @@ test("can create a post feed block", async ({ page }) => {
   expect(await page.title()).toContain("My new post feed page");
   await expect(page.getByText(/Post Feed 1/i)).toBeVisible();
 });
+
+test("can create a calendar list block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new calendar list page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "calendar_list", {
+      administrative_label: "My new calendar list block",
+      heading: "Calendar List 1",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new calendar list page");
+  await expect(page.getByText(/Calendar List 1/i)).toBeVisible();
+});
