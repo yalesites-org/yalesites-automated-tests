@@ -519,3 +519,21 @@ test("can create a calendar list block", async ({ page }) => {
   expect(await page.title()).toContain("My new calendar list page");
   await expect(page.getByText(/Calendar List 1/i)).toBeVisible();
 });
+
+test("can create a profile directory block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", {
+      Title: "My new profile directory page",
+    }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "profile_directory", {
+      administrative_label: "My new profile directory block",
+      heading: "Profile Directory 1",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new profile directory page");
+  await expect(page.getByText(/Profile Directory 1/i)).toBeVisible();
+});
