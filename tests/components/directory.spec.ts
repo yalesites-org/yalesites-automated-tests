@@ -57,7 +57,6 @@ test("can select an affiliation", async ({ page }) => {
 test("visual regression should match previous screenshot", async ({ page }) => {
   await expect(page).toHaveScreenshot({
     fullPage: true,
-    maxDiffPixelRatio: 0.17,
   });
 });
 

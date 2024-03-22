@@ -32,29 +32,49 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // use environment varaible YALESITES_URL or default to yalesites-platform.lndo.site
-    baseURL:
-      process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
+    baseURL: process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    video: "on-first-retry",
+  },
+
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.17,
+      animations: "disabled",
+    },
+    toMatchSnapshot: {
+      threshold: 0.17,
+    },
   },
 
   /* Configure projects for major browsers */
   projects: [
+    // Setup project
+    {
+      name: "setup",
+      use: { contextOptions: launchOptions },
+      testMatch: /.*\.setup\.ts/,
+    },
+
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
+      dependencies: ["setup"],
     },
 
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"], contextOptions: launchOptions },
+      dependencies: ["setup"],
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
+      dependencies: ["setup"],
     },
 
     /* Test against mobile viewports. */
@@ -65,6 +85,7 @@ export default defineConfig({
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
+      dependencies: ["setup"],
     },
 
     /* Test against branded browsers. */
@@ -76,6 +97,11 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
     // },
+    {
+      name: "Support Tests",
+      testMatch: "supportTests/*.spec.ts",
+      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
+    },
   ],
 
   /* Run your local dev server before starting the tests */

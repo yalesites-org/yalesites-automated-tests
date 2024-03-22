@@ -2,10 +2,10 @@ import { Page } from "@playwright/test";
 
 export type TabCounts = {
   [browser: string]:
-    | {
-        [platform: string]: number;
-      }
-    | number;
+  | {
+    [platform: string]: number;
+  }
+  | number;
 };
 
 export type PressKeyForBrowserFunction = (
@@ -91,7 +91,6 @@ export async function pressKey(
     let activeElement = await page.evaluate(() => {
       return `${document.activeElement.tagName}: ${document.activeElement.classList}`;
     });
-    // console.log(`Active element after pressing ${key} ${i + 1} times: ${activeElement}`);
   }
 }
 

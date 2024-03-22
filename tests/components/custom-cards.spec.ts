@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
-import { pressKeyForBrowser, type PressKeyForBrowserFunction }from "@support/tabKey";
+import { pressKeyForBrowser, type PressKeyForBrowserFunction } from "@support/tabKey";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
@@ -65,7 +65,7 @@ test.skip("can use keyboard to tab to third card", async ({ page }) => {
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
+  await expect(page).toHaveScreenshot({ fullPage: true });
 });
 
 test("should pass axe", async ({ page }) => {

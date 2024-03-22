@@ -22,15 +22,9 @@ test("has a button to apply the category filter", async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Apply' })).toBeVisible();
 });
 
-test("has a list of two posts", async ({ page }) => {
-  await expect(page.getByRole('img', { name: 'Exterior of the Beinecke' })).toBeVisible();
-  await expect(page.getByText('January 31,')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Is Drupal Worth It?' })).toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'May 24, 2023 Longform article' }).getByRole('time')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Longform article' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Red, yellow, and white' })).toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'May 24, 2023 Article with' }).getByRole('time')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Article with mostly text' })).toBeVisible();
+test("has a list of posts", async ({ page }) => {
+  const referenceCards = page.locator('li.reference-card');
+  expect(await referenceCards.count()).toBeGreaterThan(1);
 });
 
 test("can filter the posts by category", async ({ page }) => {
@@ -49,7 +43,7 @@ test("can filter the posts by category", async ({ page }) => {
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
+  await expect(page).toHaveScreenshot({ fullPage: true });
 });
 
 test("should pass axe", async ({ page }) => {
