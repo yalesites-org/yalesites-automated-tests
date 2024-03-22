@@ -485,3 +485,19 @@ test("can create a grand hero block", async ({ page }) => {
     "https://google.com",
   );
 });
+
+test("can create a post feed block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new post feed page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "post_feed", {
+      administrative_label: "My new post feed block",
+      heading: "Post Feed 1",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new post feed page");
+  await expect(page.getByText(/Post Feed 1/i)).toBeVisible();
+});
