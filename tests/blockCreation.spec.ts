@@ -137,6 +137,44 @@ test("can create a button link block", async ({ page }) => {
   ).toHaveAttribute("href", "https://duckduckgo.com");
 });
 
+test("can create a callout block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new callout page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "callout", {
+      callout_items: [
+        {
+          callout_item_heading: "This is a test callout",
+          callout_content: "This is a test callout",
+          url: "https://google.com",
+          link_text: "Google",
+        },
+        {
+          callout_item_heading: "This is another test callout",
+          callout_content: "This is another test callout",
+          url: "https://yahoo.com",
+          link_text: "Yahoo",
+        },
+      ],
+      administrative_label: "My new callout block",
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Save", exact: true })
+    .click({ force: true });
+  expect(await page.title()).toContain("My new callout page");
+  await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
+    "href",
+    "https://google.com",
+  );
+  await expect(page.getByRole("link", { name: "Yahoo" })).toHaveAttribute(
+    "href",
+    "https://yahoo.com",
+  );
+});
+
 test("can create a new quick links block", async ({ page }) => {
   expect(
     await createContentType(page, "page", { Title: "My new quick links page" }),

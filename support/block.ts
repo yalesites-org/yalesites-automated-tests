@@ -1,5 +1,10 @@
 import { type Page, type Locator, AriaRole } from "@playwright/test";
 
+// Any global timeouts inside of here is this
+// I don't want to use this, but it's the only way to have the DOM updated when
+// clicking buttons.
+const globalTimeout = 2500;
+
 type BlockType =
   | "text"
   | "image"
@@ -249,26 +254,37 @@ const fillInFormElement = async (
 ) => {
   if (value instanceof Array) {
     // And if we have an "Add another item" button.
-    const addAnotherButtonExists = await page.evaluate(() =>
-      Array.from(
+    const addAnotherItemText = await page.evaluate(() => {
+      const possibleButtons = ["Add another item", "Add Callout Item"];
+      const elementValues = Array.from(
         document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),
-      )
-        .map((el) => el.value)
-        .includes("Add another item"),
-    );
+      ).map((el) => el.value);
+
+      for (const button of possibleButtons) {
+        if (elementValues.includes(button)) {
+          return button;
+        }
+      }
+
+      return null;
+    });
 
     for (let index = 0; index < value.length; index++) {
       await fillInForm(page, value[index], index);
       try {
         // Click the "Add another item" button if it's not the last one
         if (index !== value.length - 1) {
-          if (addAnotherButtonExists === true) {
+          if (addAnotherItemText != null) {
             await page
-              .getByRole("button", { name: "Add another item" })
+              .getByRole("button", { name: addAnotherItemText })
               .click();
+            await page.waitForLoadState("networkidle");
+            await page.waitForTimeout(globalTimeout);
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
     }
   } else if (value instanceof Object) {
     await fillInForm(page, value, 0);
@@ -285,6 +301,7 @@ const fillInFormElement = async (
       "Video Description",
       "Quote",
       "Attribution",
+      "Callout Content",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'
@@ -304,12 +321,23 @@ const fillInFormElement = async (
     }
 
     const regex = new RegExp(label, "i");
-    const element =
-      elementType === "input"
-        ? context.getByLabel(regex).nth(index)
-        : context
-            .getByRole(elementType as AriaRole, { name: regex })
-            .nth(index);
+
+    const numElements = await context
+      .locator("label", { hasText: regex })
+      .count();
+    if (numElements < index + 1) {
+      // Let's assume the last one is empty for us
+      index = numElements - 1;
+    }
+
+    let element = null;
+    if (elementType === "input") {
+      element = context.getByLabel(regex).nth(index);
+    } else {
+      element = context
+        .getByRole(elementType as AriaRole, { name: regex })
+        .nth(index);
+    }
     await fillAny(element, value);
   }
 };
