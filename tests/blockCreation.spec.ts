@@ -322,3 +322,29 @@ test("can create a gallery block", async ({ page }) => {
   await page.getByRole("button", { name: "Save", exact: true }).click();
   expect(await page.title()).toContain("My new gallery page");
 });
+
+test("can create a media grid block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new media grid page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "media_grid", {
+      administrative_label: "My new media grid block",
+      image_grid_component_title: "Media Grid",
+      media_grid_items: [
+        {
+          image: "jester",
+        },
+        {
+          image: "jester",
+        },
+        {
+          image: "jester",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new media grid page");
+});
