@@ -16,7 +16,9 @@ type BlockType =
   | "divider"
   | "spotlight_landscape"
   | "spotlight_portrait"
-  | "quick_links";
+  | "quick_links"
+  | "gallery"
+  | "media_grid";
 
 interface Block {
   text: {
@@ -134,6 +136,24 @@ interface Block {
     image: string;
     reusable_block: boolean;
     [key: string]: any;
+  };
+  gallery: {
+    administrative_label: string;
+    gallery_component_title: string;
+    gallery_items: {
+      image: string;
+      gallery_item_heading: string;
+      gallery_image_caption: string;
+    }[];
+    reusable_block: boolean;
+    [key: string]: any;
+  };
+  media_grid: {
+    administrative_label: string;
+    image_grid_component_title: string;
+    image_grid_items: {
+      image: string;
+    }[];
   };
 }
 
@@ -346,7 +366,12 @@ const fillInFormElement = async (
   if (value instanceof Array) {
     // And if we have an "Add another item" button.
     const addAnotherItemText = await page.evaluate(() => {
-      const possibleButtons = ["Add another item", "Add Callout Item"];
+      const possibleButtons = [
+        "Add another item",
+        "Add Callout Item",
+        "Add Gallery Item",
+        "Add Image Grid Item",
+      ];
       const elementValues = Array.from(
         document.querySelectorAll<HTMLButtonElement>("input[type='submit']"),
       ).map((el) => el.value);
@@ -366,6 +391,7 @@ const fillInFormElement = async (
         // Click the "Add another item" button if it's not the last one
         if (index !== value.length - 1) {
           if (addAnotherItemText != null) {
+            await page.waitForTimeout(globalTimeout);
             await page
               .getByRole("button", { name: addAnotherItemText })
               .click();
@@ -393,6 +419,7 @@ const fillInFormElement = async (
       "Quote",
       "Attribution",
       "Callout Content",
+      "Gallery Image Caption",
     ];
     // If label contains content, rename it to target
     // 'Editor editing area: main'
@@ -496,6 +523,7 @@ const selectMediaItem = async (element: Locator, value: string) => {
   const page = element.page();
   await element.click();
   await page.getByRole("button", { name: "Add media" }).click({ force: true });
+  await page.waitForLoadState("networkidle");
   await page.getByLabel("Name").click();
   await page.getByLabel("Name").fill(value);
   await page.getByRole("button", { name: "Apply filters" }).click();
@@ -503,6 +531,7 @@ const selectMediaItem = async (element: Locator, value: string) => {
   await page.getByRole("button", { name: "Insert selected" }).click();
   // Need this to get past insert selected click for some reason
   await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(globalTimeout);
 };
 
 export { createBlock };

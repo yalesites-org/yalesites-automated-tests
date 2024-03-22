@@ -290,3 +290,35 @@ test("can create a new quick links block", async ({ page }) => {
     "https://yahoo.com",
   );
 });
+
+test("can create a gallery block", async ({ page }) => {
+  expect(
+    await createContentType(page, "page", { Title: "My new gallery page" }),
+  ).toBe(true);
+  expect(
+    await createBlock(page, "gallery", {
+      administrative_label: "My new gallery block",
+      gallery_component_title: "Gallery",
+      gallery_items: [
+        {
+          image: "jester",
+          gallery_item_heading: "Jester",
+          gallery_image_caption: "A jester",
+        },
+        {
+          image: "jester",
+          gallery_item_heading: "Jester",
+          gallery_image_caption: "A jester",
+        },
+        {
+          image: "jester",
+          gallery_item_heading: "Jester",
+          gallery_image_caption: "A jester",
+        },
+      ],
+      reusable_block: false,
+    }),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  expect(await page.title()).toContain("My new gallery page");
+});
