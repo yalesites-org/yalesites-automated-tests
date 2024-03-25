@@ -28,6 +28,8 @@ export default defineConfig({
   timeout: 60000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
+  testMatch: "**/*.spec.ts",
+  testIgnore: /supportTests|destructive/i,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -62,19 +64,31 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
-      dependencies: ["setup"],
+      testMatch: [
+        "**/*.spec.ts",
+        "!destructive/*.spec.ts",
+        "!supportTests/*.spec.ts",
+      ],
     },
 
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"], contextOptions: launchOptions },
-      dependencies: ["setup"],
+      testMatch: [
+        "**/*.spec.ts",
+        "!destructive/*.spec.ts",
+        "!supportTests/*.spec.ts",
+      ],
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
-      dependencies: ["setup"],
+      testMatch: [
+        "**/*.spec.ts",
+        "!destructive/*.spec.ts",
+        "!supportTests/*.spec.ts",
+      ],
     },
 
     /* Test against mobile viewports. */
@@ -85,7 +99,11 @@ export default defineConfig({
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
-      dependencies: ["setup"],
+      testMatch: [
+        "**/*.spec.ts",
+        "!destructive/*.spec.ts",
+        "!supportTests/*.spec.ts",
+      ],
     },
 
     /* Test against branded browsers. */
@@ -98,8 +116,16 @@ export default defineConfig({
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
     // },
     {
-      name: "Support Tests",
+      name: "destructive",
+      testMatch: "destructive/*.spec.ts",
+      testIgnore: [],
+      dependencies: ["setup"],
+      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
+    },
+    {
+      name: "support",
       testMatch: "supportTests/*.spec.ts",
+      testIgnore: [],
       use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
     },
   ],
