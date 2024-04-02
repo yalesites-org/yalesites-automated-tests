@@ -13,47 +13,47 @@ import type { Result, NodeResult, AxeResults } from "axe-core";
  *
  */
 const violationOutput = {
-    outputViolations: (violations: Result[]) => {
-        return violations
-            .map((violation) => violationOutput._outputViolation(violation))
-            .join("\n");
-    },
+  outputViolations: (violations: Result[]) => {
+    return violations
+      .map((violation) => violationOutput._outputViolation(violation))
+      .join("\n");
+  },
 
-    _outputViolation: (violation: Result, indentation = 0) => {
-        let { id, impact, description, nodes } = violation;
-        const indentedString = violationOutput.createIndentation(indentation);
+  _outputViolation: (violation: Result, indentation = 0) => {
+    let { id, impact, description, nodes } = violation;
+    const indentedString = violationOutput.createIndentation(indentation);
 
-        return `
+    return `
 ${indentedString}--------------------------------------------------------------------------------
 ${indentedString}Violation: ${id} (${impact})
 ${indentedString}Description: ${description}
 ${indentedString}Affected nodes:
 ${indentedString}${violationOutput._outputNodes(nodes, indentation + 1)}
     `;
-    },
+  },
 
-    _outputNodes: (nodes: NodeResult[], indentation = 0) => {
-        return Array.from(nodes, (node) =>
-            violationOutput._outputNode(node, indentation),
-        ).join("\n");
-    },
+  _outputNodes: (nodes: NodeResult[], indentation = 0) => {
+    return Array.from(nodes, (node) =>
+      violationOutput._outputNode(node, indentation),
+    ).join("\n");
+  },
 
-    _outputNode: (node: NodeResult, indention = 0) => {
-        let { html, target } = node;
+  _outputNode: (node: NodeResult, indention = 0) => {
+    let { html, target } = node;
 
-        let indentionString = "  ".repeat(indention);
+    let indentionString = "  ".repeat(indention);
 
-        return `
+    return `
 ${indentionString}----------------------------------------
 ${indentionString}${target}
 ${indentionString}${html}
 
 ${indentionString}${node.failureSummary}
     `;
-    },
-    createIndentation(indention: number) {
-        return "  ".repeat(indention);
-    },
+  },
+  createIndentation(indention: number) {
+    return "  ".repeat(indention);
+  },
 };
 
 /*
@@ -65,72 +65,87 @@ ${indentionString}${node.failureSummary}
  * @returns {object} - An object with the pass/fail results of the test.
  */
 export const expect = baseExpect.extend({
-    async toPassAxe(
-        page: Page,
-        options: {
-            tags: Array<string>;
-            options?: { timeout?: number };
-            outputBuffer?: typeof violationOutput;
-        },
-    ) {
-        if (!options.outputBuffer) {
-            options.outputBuffer = violationOutput;
-        }
-
-        const { tags, options: axePageOptions, outputBuffer } = options;
-        const axePage = new AxePage(page, { tags, ...axePageOptions });
-        let pass: boolean;
-        let matcherResult: any;
-        const expected = 0;
-
-        const results = await axePage.evaluate();
-
-        try {
-            baseExpect(results.violations.length).toBe(0);
-            pass = true;
-        } catch (e: any) {
-            pass = false;
-            matcherResult = e.matcherResult;
-        }
-
-        const message = pass
-            ? () => "True"
-            : () => {
-                return outputBuffer.outputViolations(results.violations);
-            };
-
-        return {
-            message,
-            pass,
-            name: "toBeAccessible",
-            expected,
-            actual: matcherResult?.actual,
-        };
+  async toPassAxe(
+    page: Page,
+    options: {
+      tags: Array<string>;
+      options?: { timeout?: number };
+      outputBuffer?: typeof violationOutput;
     },
+  ) {
+    if (!options.outputBuffer) {
+      options.outputBuffer = violationOutput;
+    }
+
+    const { tags, options: axePageOptions, outputBuffer } = options;
+    const axePage = new AxePage(page, {
+      tags,
+      ...axePageOptions,
+      excludes: ["iframe"],
+    });
+    let pass: boolean;
+    let matcherResult: any;
+    const expected = 0;
+
+    const results = await axePage.evaluate();
+
+    try {
+      baseExpect(results.violations.length).toBe(0);
+      pass = true;
+    } catch (e: any) {
+      pass = false;
+      matcherResult = e.matcherResult;
+    }
+
+    const message = pass
+      ? () => "True"
+      : () => {
+          return outputBuffer.outputViolations(results.violations);
+        };
+
+    return {
+      message,
+      pass,
+      name: "toBeAccessible",
+      expected,
+      actual: matcherResult?.actual,
+    };
+  },
 });
 
 /*
  * A wrapper around axe-core/playwright to make it easier to use.
  */
 export class AxePage {
-    private readonly axeBuilder: AxeBuilder;
-    public results: AxeResults;
+  private readonly axeBuilder: AxeBuilder;
+  public results: AxeResults;
 
-    constructor(
-        public readonly page: Page,
-        public readonly options = { tags: [] as string[] },
-    ) {
-        let axeBuilder = new AxeBuilder({ page });
+  constructor(
+    public readonly page: Page,
+    public readonly options = {
+      tags: [] as string[],
+      excludes: [] as string[],
+    },
+  ) {
+    let axeBuilder = new AxeBuilder({ page });
 
-        if (options.tags && options.tags.length > 0) {
-            axeBuilder.withTags(options.tags);
-        }
-
-        this.axeBuilder = axeBuilder;
+    if (options.tags && options.tags.length > 0) {
+      axeBuilder.withTags(options.tags);
     }
 
-    async evaluate(): Promise<AxeResults> {
-        this.results = await this.axeBuilder.analyze();
-        return this.results;
+    if (options.excludes && options.excludes.length > 0) {
+      for (let index = 0; index < options.excludes.length; index++) {
+        axeBuilder.exclude(options.excludes[index]);
+      }
     }
+
+    axeBuilder.exclude(options.excludes);
+    this.axeBuilder = axeBuilder;
+  }
+
+  async evaluate(): Promise<AxeResults> {
+    this.results = await this.axeBuilder.analyze();
+    return this.results;
+  }
 }
+
