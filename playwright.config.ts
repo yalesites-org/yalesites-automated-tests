@@ -20,16 +20,14 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 2,
+  retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  reporter: process.env.CLI ? "line" : "html",
   timeout: 60000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
-  testMatch: "**/*.spec.ts",
-  testIgnore: /supportTests|destructive/i,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -66,31 +64,19 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
-      testMatch: [
-        "**/*.spec.ts",
-        "!destructive/*.spec.ts",
-        "!supportTests/*.spec.ts",
-      ],
+      dependencies: ["setup"],
     },
 
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"], contextOptions: launchOptions },
-      testMatch: [
-        "**/*.spec.ts",
-        "!destructive/*.spec.ts",
-        "!supportTests/*.spec.ts",
-      ],
+      dependencies: ["setup"],
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
-      testMatch: [
-        "**/*.spec.ts",
-        "!destructive/*.spec.ts",
-        "!supportTests/*.spec.ts",
-      ],
+      dependencies: ["setup"],
     },
 
     /* Test against mobile viewports. */
@@ -101,11 +87,7 @@ export default defineConfig({
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
-      testMatch: [
-        "**/*.spec.ts",
-        "!destructive/*.spec.ts",
-        "!supportTests/*.spec.ts",
-      ],
+      dependencies: ["setup"],
     },
 
     /* Test against branded browsers. */
@@ -118,17 +100,11 @@ export default defineConfig({
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome', contextOptions: launchOptions },
     // },
     {
-      name: "destructive",
-      testMatch: "destructive/*.spec.ts",
-      testIgnore: [],
-      dependencies: ["setup"],
-      use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
-    },
-    {
       name: "support",
       testMatch: "supportTests/*.spec.ts",
       testIgnore: [],
       use: { ...devices["Desktop Chrome"], contextOptions: launchOptions },
+      dependencies: ["setup"],
     },
   ],
 

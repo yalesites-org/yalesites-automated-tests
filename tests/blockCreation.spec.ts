@@ -23,6 +23,10 @@ test("can create a new text block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect(
+  //   page.getByText("The layout override has been saved."),
+  // ).toBeVisible();
   expect(await page.title()).toContain("My new page");
   expect(page.getByRole("paragraph")).toHaveText("This is a test");
 });
@@ -39,9 +43,9 @@ test("can create an image block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
 
   expect(await page.title()).toContain("My new image page");
 });
@@ -59,9 +63,9 @@ test("can create a video block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
 
   expect(await page.title()).toContain("My new video page");
 });
@@ -83,9 +87,9 @@ test("can create a wrapped image block", async ({ page }) => {
       image: "jester",
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new wrapped image page");
 });
 
@@ -102,9 +106,9 @@ test("can create a quote block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new quote page");
 });
 
@@ -128,9 +132,9 @@ test("can create a button link block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new button link page");
   await expect(
     page.getByRole("link", { name: "Duck Duck Go" }),
@@ -161,9 +165,9 @@ test("can create a callout block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new callout page");
   await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
     "href",
@@ -187,9 +191,9 @@ test("can create a divider block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new divider page");
 });
 
@@ -215,9 +219,9 @@ test("can create a spotlight landscape block", async ({ page }) => {
       reusable_block: false,
     }),
   ).toBe(true);
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new spotlight landscape page");
   await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
     "href",
@@ -247,9 +251,9 @@ test("can create a spotlight portrait block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.waitForLoadState("networkidle");
-  await page
-    .getByRole("button", { name: "Save", exact: true })
-    .click({ force: true });
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
+  // await expect.soft(page.getByRole("contentinfo", { name: "Status message" })).toHaveText(/The layout override has been saved/);
   expect(await page.title()).toContain("My new spotlight portrait page");
   await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
     "href",
@@ -274,6 +278,7 @@ test("can create a new quick links block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new quick links page");
   await expect(
     page.getByRole("heading", { name: "Quick Links", exact: true }),
@@ -320,6 +325,7 @@ test("can create a gallery block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new gallery page");
 });
 
@@ -346,6 +352,7 @@ test("can create a media grid block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new media grid page");
 });
 
@@ -375,6 +382,7 @@ test("can create an accordion block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new accordion page");
 });
 
@@ -391,6 +399,7 @@ test("can create an embed block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new embed page");
 });
 
@@ -426,6 +435,7 @@ test("can create a custom card block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new custom card page");
   await expect(
     page.getByRole("link", { name: /Custom Card 1/i }),
@@ -453,6 +463,7 @@ test("can create an action banner block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new action banner page");
   await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
     "href",
@@ -479,6 +490,7 @@ test("can create a grand hero block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new grand hero page");
   await expect(page.getByRole("link", { name: "Google" })).toHaveAttribute(
     "href",
@@ -498,6 +510,7 @@ test("can create a post feed block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new post feed page");
   await expect(page.getByText(/Post Feed 1/i)).toBeVisible();
 });
@@ -516,8 +529,9 @@ test("can create a calendar list block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new calendar list page");
-  await expect(page.getByText(/Calendar List 1/i)).toBeVisible();
+  await expect(page.getByText(/Calendar List 1/i).first()).toBeVisible();
 });
 
 test("can create a profile directory block", async ({ page }) => {
@@ -534,6 +548,7 @@ test("can create a profile directory block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(2000);
   expect(await page.title()).toContain("My new profile directory page");
   await expect(page.getByText(/Profile Directory 1/i)).toBeVisible();
 });
@@ -563,6 +578,7 @@ test("can create a tab block", async ({ page }) => {
     }),
   ).toBe(true);
   await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForTimeout(1500);
   expect(await page.title()).toContain("My new tab page");
   await expect(page.getByRole("tab", { name: /Tab 1/i })).toBeVisible();
 });
