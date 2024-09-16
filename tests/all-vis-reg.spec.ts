@@ -37,6 +37,7 @@ testScreenshotForPage("content-spotlight");
 testScreenshotForPage("custom-cards");
 testScreenshotForPage("divider");
 testScreenshotForPage("embed");
+testScreenshotForPage("facts-and-figures");
 testScreenshotForPage("gallery");
 testScreenshotForPage("grand-hero");
 testScreenshotForPage("image");
