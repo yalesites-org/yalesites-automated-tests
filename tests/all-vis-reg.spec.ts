@@ -46,6 +46,7 @@ testScreenshotForPage("post-feed");
 testScreenshotForPage("pre-built-form");
 testScreenshotForPage("quick-links");
 testScreenshotForPage("quote");
+testScreenshotForPage("quote-callout");
 testScreenshotForPage("tabs");
 testScreenshotForPage("text");
 testScreenshotForPage("video");
