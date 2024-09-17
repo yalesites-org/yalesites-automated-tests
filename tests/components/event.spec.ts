@@ -14,11 +14,11 @@ test("has a heading", async ({ page }) => {
 });
 
 test("has a date", async ({ page }) => {
-  await expect(page.getByText('Friday, December 5,')).toBeVisible();
+  await expect(page.getByText('Fri Dec 5, 2036').first()).toBeVisible();
 });
 
 test("has a time", async ({ page }) => {
-  await expect(page.getByText('-6 pm EST')).toBeVisible();
+  await expect(page.getByText('5:00 p.m.—6:00 p.m.').first()).toBeVisible();
 });
 
 test("has a location", async ({ page }) => {

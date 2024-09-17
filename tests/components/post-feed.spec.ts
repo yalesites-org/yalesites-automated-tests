@@ -23,13 +23,13 @@ test("has a button to apply the category filter", async ({ page }) => {
 });
 
 test("has a list of two posts", async ({ page }) => {
-  await expect(page.getByRole('img', { name: 'Exterior of the Beinecke' })).toBeVisible();
+  await expect(page.getByAltText('Exterior of the Beinecke')).toBeVisible();
   await expect(page.getByText('January 31,')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Is Drupal Worth It?' })).toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'May 24, 2023 Longform article' }).getByRole('time')).toBeVisible();
+  await expect(page.locator('li').filter({ hasText: 'Longform article May 24, 2023' }).getByRole('time')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Longform article' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Red, yellow, and white' })).toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'May 24, 2023 Article with' }).getByRole('time')).toBeVisible();
+  await expect(page.getByAltText('Red, yellow, and white')).toBeVisible();
+  await expect(page.locator('li').filter({ hasText: 'Article with mostly text May 24, 2023' }).getByRole('time')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Article with mostly text' })).toBeVisible();
 });
 
@@ -38,13 +38,13 @@ test("can filter the posts by category", async ({ page }) => {
   await page.getByRole('button', { name: 'Apply' }).click();
   await expect(page.getByLabel('Post Category')).toBeVisible();
   await expect(page.getByLabel('Post Category')).toHaveValue('27');
-  await expect(page.getByRole('img', { name: 'Exterior of the Beinecke' })).toBeVisible();
+  await expect(page.getByAltText('Exterior of the Beinecke')).toBeVisible();
   await expect(page.getByText('January 31,')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Is Drupal Worth It?' })).toBeVisible();
 
   await expect(page.getByRole('link', { name: 'Longform article' })).not.toBeVisible();
-  await expect(page.getByRole('img', { name: 'Red, yellow, and white' })).not.toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'May 24, 2023 Article with' }).getByRole('time')).not.toBeVisible();
+  await expect(page.getByAltText('Red, yellow, and white')).not.toBeVisible();
+  await expect(page.locator('li').filter({ hasText: 'Article with May 24, 2023' }).getByRole('time')).not.toBeVisible();
   await expect(page.getByRole('link', { name: 'Article with mostly text' })).not.toBeVisible();
 });
 

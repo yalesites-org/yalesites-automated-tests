@@ -41,6 +41,7 @@ testScreenshotForPage("facts-and-figures");
 testScreenshotForPage("gallery");
 testScreenshotForPage("grand-hero");
 testScreenshotForPage("image");
+testScreenshotForPage("image-banner");
 testScreenshotForPage("media-grid");
 testScreenshotForPage("post-feed");
 testScreenshotForPage("pre-built-form");

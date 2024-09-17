@@ -24,27 +24,27 @@ test("should have an event category drop down with button", async ({
 
 test("should have a list of events", async ({ page }) => {
   await expect(
-    page.locator("li").filter({ hasText: "In-person Office Hours with" }),
+    page.locator("li").filter({ hasText: "Office Hours with" }),
   ).toBeVisible();
   await expect(page.getByText("In-person")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Office Hours with Mike" }),
   ).toBeVisible();
-  await expect(page.getByText("Wednesday, February 14,")).toBeVisible();
+  await expect(page.getByText("WED FEB 14,")).toBeVisible();
   await expect(
-    page.getByRole("img", { name: "Two wooden chairs in an aisle" }),
+    page.getByAltText("Two wooden chairs in an aisle between shelves of books in a library"),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "MichaelCON" })).toBeVisible();
-  await expect(page.getByText("Thursday, July 3,")).toBeVisible();
+  await expect(page.getByText("THU JUL 3,")).toBeVisible();
   await expect(
-    page.locator("li").filter({ hasText: "MichaelCON Thursday, July 3," }),
+    page.locator("li").filter({ hasText: "MichaelCON THU JUL 3," }),
   ).toBeVisible();
   await expect(
-    page.locator("li").filter({ hasText: "Hybrid Event #1 for E2E" }),
+    page.locator("li").filter({ hasText: "#1 for E2E" }),
   ).toBeVisible();
   await expect(page.getByText("Hybrid")).toBeVisible();
   await expect(
-    page.locator("li").filter({ hasText: "Dinner with Dad Tuesday, May" }),
+    page.locator("li").filter({ hasText: "Dinner with Dad TUE MAY" }),
   ).toBeVisible();
 });
 

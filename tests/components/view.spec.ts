@@ -14,16 +14,16 @@ test("has a heading for the view", async ({ page }) => {
 });
 
 test("has the first event", async ({ page }) => {
-  await expect(page.getByRole('img', { name: 'Michael Vaughn wearing a' })).toBeVisible();
+  await expect(page.getByAltText('Michael Vaughn wearing a')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Dinner with Dad' })).toBeVisible();
-  await expect(page.getByText('Tuesday, May 5,')).toBeVisible();
+  await expect(page.getByText('TUE MAY 5,')).toBeVisible();
   await expect(page.getByText('This is some teaser text')).toBeVisible();
 });
 
 test("has the second event", async ({ page }) => {
-  await expect(page.getByRole('img', { name: 'Two wooden chairs in an aisle' })).toBeVisible();
+  await expect(page.getByAltText('Two wooden chairs in an aisle')).toBeVisible();
   await expect(page.getByRole('link', { name: 'MichaelCON' })).toBeVisible();
-  await expect(page.getByText('Thursday, July 3,')).toBeVisible();
+  await expect(page.getByText('THU JUL 3,')).toBeVisible();
 });
 
 test("visual regression should match previous screenshot", async ({ page }) => {

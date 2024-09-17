@@ -7,7 +7,8 @@
     "test": "playwright test",
     "ui": "playwright test --ui",
     "debug": "playwright test --debug",
-    "dev": "playwright test --reporter line"
+    "dev": "playwright test --reporter line",
+    "update-snapshots": "playwright test --update-snapshots"
   },
   "keywords": [],
   "author": "",

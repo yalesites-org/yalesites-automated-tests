@@ -36,3 +36,15 @@ test("has fact 4: You are awesome, too", async ({ page }) => {
   await expect(page.getByText('You are awesome, too')).toBeVisible();
   await expect(page.getByText('This is the fourth fact')).toBeVisible();
 });
+
+test("should pass axe", async ({ page }) => {
+  const axe_tags = [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice",
+  ];
+  await expect(page).toPassAxe({ tags: axe_tags });
+});
+
