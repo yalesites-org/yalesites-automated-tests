@@ -42,6 +42,8 @@ testScreenshotForPage("gallery");
 testScreenshotForPage("grand-hero");
 testScreenshotForPage("image");
 testScreenshotForPage("image-banner");
+testScreenshotForPage("in-line-message");
+testScreenshotForPage("link-grid");
 testScreenshotForPage("media-grid");
 testScreenshotForPage("post-feed");
 testScreenshotForPage("pre-built-form");
