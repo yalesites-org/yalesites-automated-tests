@@ -1,6 +1,8 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction } from "@support/tabKey";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
@@ -37,14 +39,5 @@ test("has fact 4: You are awesome, too", async ({ page }) => {
   await expect(page.getByText('This is the fourth fact')).toBeVisible();
 });
 
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
-
+a11yTests();
+visRegTests();

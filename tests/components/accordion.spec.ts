@@ -1,6 +1,8 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
@@ -44,7 +46,7 @@ test("first accordion content is displayed when expanded", async ({ page }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 1" }).click();
   await expect(
     page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
+      "Accordion content under heading 1. And let's throw a link in here to an",
     ),
   ).toBeVisible();
 });
@@ -55,7 +57,7 @@ test("second accordion content is displayed when expanded", async ({
   await page.getByRole("button", { name: "Accordion Item Heading 2" }).click();
   await expect(
     page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
+      "Accordion content under heading 2. And let's throw a link in here to an",
     ),
   ).toBeVisible();
 });
@@ -64,12 +66,12 @@ test("Expand All should open all accordions", async ({ page }) => {
   await page.getByRole("button", { name: "Expand All" }).click();
   await expect(
     page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
+      "Accordion content under heading 1. And let's throw a link in here to an",
     ),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
+      "Accordion content under heading 2. And let's throw a link in here to an",
     ),
   ).toBeVisible();
 });
@@ -79,12 +81,12 @@ test("Collapse All should close all accordions", async ({ page }) => {
   await page.getByRole("button", { name: "Collapse All" }).click();
   await expect(
     page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
+      "Accordion content under heading 1. And let's throw a link in here to an",
     ),
   ).not.toBeVisible();
   await expect(
     page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
+      "Accordion content under heading 2. And let's throw a link in here to an",
     ),
   ).not.toBeVisible();
 });
@@ -101,17 +103,5 @@ test.skip("can tab to heading 1", async ({ page, isMobile }) => {
   ).toBeFocused();
 });
 
-test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
-});
-
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
+a11yTests();
+visRegTests();
