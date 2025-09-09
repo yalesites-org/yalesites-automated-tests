@@ -48,7 +48,7 @@ const tests = () => {
 
     const searchResults = await page.$("div.search-result");
 
-    expect(searchResults);
+    expect(searchResults).toBeFalsy();
 
     if (searchResults) {
       const searchResultsText = await searchResults.textContent();
