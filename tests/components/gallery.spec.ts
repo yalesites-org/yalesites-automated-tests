@@ -55,7 +55,8 @@ test("can see the image clicked on", async ({ page }) => {
 
 test("can expand more info about the image", async ({ page }) => {
   await page.getByRole('button', { name: 'Aerial View of Yale' }).click();
-  // Why are there two here?
+  // Using nth(1) because there are two expand buttons: one in the gallery and one in the modal
+  // We need the modal's expand button which is the second one
   await page.getByRole('button', { name: 'expand' }).nth(1).click();
   await expect(page.getByText('Lorem ipsum dolor sit amet').nth(1)).toBeVisible();
 });
