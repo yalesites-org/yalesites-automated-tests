@@ -1,18 +1,18 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction } from "@support/tabKey";
+import { setupComponentPage, TIMEOUTS } from "@support/testConfig";
 import a11yTests from "@support/a11yTests";
 import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
-  await page.goto("/component-pages-for-e2e-testing/divider");
-  await page.waitForLoadState("load");
+  await setupComponentPage(page, "divider");
 });
 
 test("exists on the page", async ({ page }) => {
-  await expect(page.locator('.divider')).toBeVisible();
+  await expect(page.locator('.divider')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 a11yTests();

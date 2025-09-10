@@ -21,11 +21,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Limit workers to reduce Drupal database contention */
+  workers: process.env.CI ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
-  timeout: 60000,
+  reporter: [["html", { open: "never" }]],
+  timeout: 120000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -34,6 +34,9 @@ export default defineConfig({
     // use environment varaible YALESITES_URL or default to yalesites-platform.lndo.site
     baseURL:
       process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
+    
+    /* Navigation timeout for slow Drupal responses */
+    navigationTimeout: 30000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
