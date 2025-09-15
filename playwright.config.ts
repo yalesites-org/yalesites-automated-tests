@@ -24,7 +24,8 @@ export default defineConfig({
   /* Limit workers to reduce Drupal database contention */
   workers: process.env.CI ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html", { open: "never" }]],
+  /* reporter: [["html", { open: "never" }]], */
+  reporter: [["html"]],
   timeout: 120000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
