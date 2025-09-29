@@ -1,29 +1,31 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import { setupComponentPage, TIMEOUTS } from "@support/testConfig";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
-  await page.goto("/component-pages-for-e2e-testing/pre-built-form");
-  await page.waitForLoadState("load");
+  await setupComponentPage(page, "pre-built-form");
 });
 
 test("has a heading", async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Pre-Built Form', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Pre-Built Form', exact: true })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has a form with four fields and a submit button", async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Pre-Built Form Title' })).toBeVisible();
-  await expect(page.getByText('Your Name')).toBeVisible();
-  await expect(page.getByLabel('Your Name')).toBeVisible();
-  await expect(page.getByText('Your Email')).toBeVisible();
-  await expect(page.getByLabel('Your Email')).toBeVisible();
-  await expect(page.getByText('Subject')).toBeVisible();
-  await expect(page.getByLabel('Subject')).toBeVisible();
-  await expect(page.getByText('Message')).toBeVisible();
-  await expect(page.getByLabel('Message')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Pre-Built Form Title' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByText('Your Name')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByLabel('Your Name')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByText('Your Email')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByLabel('Your Email')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByText('Subject')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByLabel('Subject')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByText('Message')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByLabel('Message')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("can fill out the form and submit it", async ({ page }) => {
@@ -40,17 +42,5 @@ test("can fill out the form and submit it", async ({ page }) => {
   // await expect(page.getByRole('group', { name: 'CAPTCHA' })).toBeVisible();
 });
 
-test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
-});
-
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
+a11yTests();
+visRegTests();

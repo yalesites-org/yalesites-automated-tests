@@ -1,36 +1,26 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import { setupComponentPage, TIMEOUTS } from "@support/testConfig";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
-  await page.goto("/component-pages-for-e2e-testing/media-grid");
-  await page.waitForLoadState("load");
+  await setupComponentPage(page, "media-grid");
 });
 
 test("has a heading", async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Media Grid Title' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Media Grid Title' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has four images", async ({ page }) => {
-  await expect(page.getByRole('img', { name: 'Aerial View of Yale University' }).first()).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Aerial View of Yale University' }).nth(1)).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Towering shelves of books in' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Two wooden chairs in an aisle' })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'Aerial View of Yale University' }).first()).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByRole('img', { name: 'Aerial View of Yale University' }).nth(1)).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByRole('img', { name: 'Towering shelves of books in' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
+  await expect(page.getByRole('img', { name: 'Two wooden chairs in an aisle' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
-test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
-});
-
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
+a11yTests();
+visRegTests();

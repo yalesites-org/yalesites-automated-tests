@@ -1,12 +1,14 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import { setupComponentPage, TIMEOUTS } from "@support/testConfig";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
-  await page.goto("/component-pages-for-e2e-testing/accordion");
-  await page.waitForLoadState("load");
+  await setupComponentPage(page, "accordion");
 });
 
 test("if some accordions are open, ensure that the toggle button is set to Expand All", async ({
@@ -14,8 +16,8 @@ test("if some accordions are open, ensure that the toggle button is set to Expan
 }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 1" }).click();
   await expect(
-    page.getByLabel("Section controls").getByRole("button"),
-  ).toContainText("Expand All");
+    page.getByLabel("Section controls").getByRole("button", { name: /Expand All/i }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("if all accordions are manually expanded, ensure that the toggle button is set to Collapse All", async ({
@@ -24,72 +26,80 @@ test("if all accordions are manually expanded, ensure that the toggle button is 
   await page.getByRole("button", { name: "Accordion Item Heading 1" }).click();
   await page.getByRole("button", { name: "Accordion Item Heading 2" }).click();
   await expect(
-    page.getByLabel("Section controls").getByRole("button"),
-  ).toContainText("Collapse All");
+    page.getByLabel("Section controls").getByRole("button", { name: /Collapse All/i }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("first accordion title is displayed", async ({ page }) => {
-  await expect(page.getByRole("main")).toContainText(
-    "Accordion Item Heading 1",
-  );
+  await expect(
+    page.getByRole("button", { name: "Accordion Item Heading 1" })
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("second accordion title is displayed", async ({ page }) => {
-  await expect(page.getByRole("main")).toContainText(
-    "Accordion Item Heading 2",
-  );
+  await expect(
+    page.getByRole("button", { name: "Accordion Item Heading 2" })
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("first accordion content is displayed when expanded", async ({ page }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 1" }).click();
+  
+  // Wait for accordion animation to complete
+  await page.waitForTimeout(TIMEOUTS.ANIMATION);
+  
   await expect(
-    page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
-    ),
-  ).toBeVisible();
+    page.getByText("Accordion content under heading 1", { exact: false }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("second accordion content is displayed when expanded", async ({
   page,
 }) => {
   await page.getByRole("button", { name: "Accordion Item Heading 2" }).click();
+  
+  // Wait for accordion animation to complete
+  await page.waitForTimeout(TIMEOUTS.ANIMATION);
+  
   await expect(
-    page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
-    ),
-  ).toBeVisible();
+    page.getByText("Accordion content under heading 2", { exact: false }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("Expand All should open all accordions", async ({ page }) => {
   await page.getByRole("button", { name: "Expand All" }).click();
+  
+  // Wait for accordion animation to complete
+  await page.waitForTimeout(TIMEOUTS.ANIMATION);
+  
   await expect(
-    page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
-    ),
-  ).toBeVisible();
+    page.getByText("Accordion content under heading 1", { exact: false }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
   await expect(
-    page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
-    ),
-  ).toBeVisible();
+    page.getByText("Accordion content under heading 2", { exact: false }),
+  ).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("Collapse All should close all accordions", async ({ page }) => {
   await page.getByRole("button", { name: "Expand All" }).click();
+  await page.waitForTimeout(TIMEOUTS.ANIMATION);
+  
   await page.getByRole("button", { name: "Collapse All" }).click();
+  await page.waitForTimeout(TIMEOUTS.ANIMATION);
+  
   await expect(
-    page.getByText(
-      "Accordion content under heading 1. And let’s throw a link in here to an",
-    ),
-  ).not.toBeVisible();
+    page.getByText("Accordion content under heading 1", { exact: false }),
+  ).not.toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
   await expect(
-    page.getByText(
-      "Accordion content under heading 2. And let’s throw a link in here to an",
-    ),
-  ).not.toBeVisible();
+    page.getByText("Accordion content under heading 2", { exact: false }),
+  ).not.toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test.skip("can tab to heading 1", async ({ page, isMobile }) => {
+  // TODO: Keyboard navigation tests need investigation
+  // The pressTabKeyRepeatedly function tab counts may not match current page structure
+  // This test was originally skipped and needs proper debugging
+  
   if (isMobile) {
     await page.waitForTimeout(1000);
   }
@@ -98,20 +108,8 @@ test.skip("can tab to heading 1", async ({ page, isMobile }) => {
 
   await expect(
     page.getByRole("button", { name: "Accordion Item Heading 1" }),
-  ).toBeFocused();
+  ).toBeFocused({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
-test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
-});
-
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
+a11yTests();
+visRegTests();

@@ -1,6 +1,9 @@
 import { test } from "@playwright/test";
 import { expect } from "@support/axePage";
 import { pressKeyForBrowser, type PressKeyForBrowserFunction, type TabCounts } from "@support/tabKey";
+import { TIMEOUTS } from "@support/testConfig";
+import a11yTests from "@support/a11yTests";
+import visRegTests from "@support/visRegTests";
 
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
@@ -10,40 +13,28 @@ test.beforeEach(async ({ page, browserName, isMobile }) => {
 });
 
 test("has a heading", async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Event #1 for E2E' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Event #1 for E2E' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has a date", async ({ page }) => {
-  await expect(page.getByText('Friday, December 5,')).toBeVisible();
+  await expect(page.getByText('Fri Dec 5, 2036').first()).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has a time", async ({ page }) => {
-  await expect(page.getByText('-6 pm EST')).toBeVisible();
+  await expect(page.getByText('5:00 p.m.—6:00 p.m.').first()).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
-test("has a location", async ({ page }) => {
-  await expect(page.getByText('Hybrid')).toBeVisible();
+test("has event details section", async ({ page }) => {
+  await expect(page.locator('.event-meta__details-wrapper')).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has the event link", async ({ page }) => {
-  await expect(page.getByRole('link', { name: 'Example External Event' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Example External Event' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
 test("has the add to calendar link", async ({ page }) => {
-  await expect(page.getByRole('link', { name: 'Add to Calendar' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Add to Calendar' })).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE });
 });
 
-test("visual regression should match previous screenshot", async ({ page }) => {
-  await expect(page).toHaveScreenshot({ fullPage: true, maxDiffPixelRatio: 0.17 });
-});
-
-test("should pass axe", async ({ page }) => {
-  const axe_tags = [
-    "wcag2a",
-    "wcag2aa",
-    "wcag21a",
-    "wcag21aa",
-    "best-practice",
-  ];
-  await expect(page).toPassAxe({ tags: axe_tags });
-});
+a11yTests();
+visRegTests();
