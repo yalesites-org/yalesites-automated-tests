@@ -126,6 +126,9 @@ export class AxePage {
             axeBuilder.withTags(options.tags);
         }
 
+        // Exclude all iframes from axe evaluation to prevent reCAPTCHA violations
+        axeBuilder.exclude('iframe');
+
         this.axeBuilder = axeBuilder;
     }
 
