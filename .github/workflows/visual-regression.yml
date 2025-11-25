@@ -106,6 +106,10 @@ jobs:
         with:
           pattern: playwright-report-*
           path: all-reports
+          merge-multiple: true
+
+      - name: List downloaded artifacts (debug)
+        run: ls -R all-reports
 
       - name: Merge reports
         run: |
@@ -166,9 +170,31 @@ jobs:
             ---
             *Currently testing: **Chromium only** (configurable via workflow dispatch)*`;
 
-            github.rest.issues.createComment({
+            // Find existing comment to update
+            const botComment = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
             });
+
+            const existingComment = botComment.data.find(c =>
+              c.user.type === 'Bot' && c.body.includes('📸 Visual Regression Test Results')
+            );
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
