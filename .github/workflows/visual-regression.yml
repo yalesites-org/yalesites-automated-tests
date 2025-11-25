@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
-      image: mcr.microsoft.com/playwright:v1.41.2-jammy
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
 
     strategy:
       fail-fast: false
@@ -173,7 +173,7 @@ jobs:
               -v $(pwd):/work \\
               -w /work \\
               -e YALESITES_URL="http://your-test-url" \\
-              mcr.microsoft.com/playwright:v1.41.2-jammy \\
+              mcr.microsoft.com/playwright:v1.48.2-jammy \\
               npm run update-snapshots
 
             # Commit and push the updated snapshots

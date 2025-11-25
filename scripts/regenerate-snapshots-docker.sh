@@ -51,7 +51,7 @@ docker run --rm -it \
   -w /work \
   -e YALESITES_URL="$YALESITES_URL" \
   -e CI=true \
-  mcr.microsoft.com/playwright:v1.41.2-jammy \
+  mcr.microsoft.com/playwright:v1.48.2-jammy \
   npm run update-snapshots
 
 echo ""
