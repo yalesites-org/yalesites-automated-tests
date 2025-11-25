@@ -61,18 +61,18 @@ jobs:
           HOME: /root
         run: |
           if [ "${{ steps.browser.outputs.browser }}" = "all" ]; then
-            npx playwright test --shard=${{ matrix.shard }}/4 --reporter=html
+            npx playwright test --shard=${{ matrix.shard }}/4 --reporter=blob
           else
-            npx playwright test --project=${{ steps.browser.outputs.browser }} --shard=${{ matrix.shard }}/4 --reporter=html
+            npx playwright test --project=${{ steps.browser.outputs.browser }} --shard=${{ matrix.shard }}/4 --reporter=blob
           fi
         continue-on-error: true
 
-      - name: Upload HTML report shard
+      - name: Upload blob report shard
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.shard }}
-          path: playwright-report/
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report/
           retention-days: 30
 
       - name: Upload test results
@@ -101,19 +101,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download all report artifacts
+      - name: Download all blob report artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: playwright-report-*
-          path: all-reports
-          merge-multiple: true
+          pattern: blob-report-*
+          path: all-blob-reports
 
       - name: List downloaded artifacts (debug)
-        run: ls -R all-reports
+        run: ls -R all-blob-reports
 
       - name: Merge reports
         run: |
-          npx playwright merge-reports --reporter=html ./all-reports
+          npx playwright merge-reports --reporter=html ./all-blob-reports
 
       - name: Upload merged HTML report
         uses: actions/upload-artifact@v4
