@@ -1,0 +1,177 @@
+name: Visual Regression Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/**'
+      - 'support/**'
+      - 'snapshots/**'
+      - 'playwright.config.ts'
+      - 'package*.json'
+      - '.github/workflows/visual-regression.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to test (chromium, firefox, webkit, mobile-safari, or all)'
+        required: false
+        default: 'chromium'
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.41.2-jammy
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs pull
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine browser to test
+        id: browser
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "browser=${{ github.event.inputs.browser }}" >> $GITHUB_OUTPUT
+          else
+            echo "browser=chromium" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run visual regression tests
+        env:
+          YALESITES_URL: ${{ secrets.YALESITES_TEST_URL || 'http://yalesites-platform.lndo.site' }}
+          HOME: /root
+        run: |
+          if [ "${{ steps.browser.outputs.browser }}" = "all" ]; then
+            npx playwright test --shard=${{ matrix.shard }}/4 --reporter=html
+          else
+            npx playwright test --project=${{ steps.browser.outputs.browser }} --shard=${{ matrix.shard }}/4 --reporter=html
+          fi
+        continue-on-error: true
+
+      - name: Upload HTML report shard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 7
+
+  merge-reports:
+    needs: visual-regression
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all report artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: playwright-report-*
+          path: all-reports
+
+      - name: Merge reports
+        run: |
+          npx playwright merge-reports --reporter=html ./all-reports
+
+      - name: Upload merged HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merged
+          path: playwright-report/
+          retention-days: 30
+
+  report-results:
+    needs: [visual-regression, merge-reports]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const comment = `## 📸 Visual Regression Test Results
+
+            **Workflow Run:** [View detailed results](${runUrl})
+
+            ### How to review visual changes:
+
+            1. Click the workflow link above
+            2. Scroll to the **Artifacts** section at the bottom
+            3. Download the \`playwright-report-merged\` artifact
+            4. Unzip and open \`index.html\` in your browser
+            5. Review any visual diffs with the built-in comparison slider
+
+            ### If visual changes are intentional:
+
+            \`\`\`bash
+            # Update snapshots using Docker (matches CI environment)
+            docker run --rm -it \\
+              -v $(pwd):/work \\
+              -w /work \\
+              -e YALESITES_URL="http://your-test-url" \\
+              mcr.microsoft.com/playwright:v1.41.2-jammy \\
+              npm run update-snapshots
+
+            # Commit and push the updated snapshots
+            git add snapshots/
+            git commit -m "chore(snapshots): update visual regression baselines"
+            git push
+            \`\`\`
+
+            ### Need to test more browsers?
+
+            Re-run this workflow manually and select a different browser option (chromium, firefox, webkit, mobile-safari, or all).
+
+            ---
+            *Currently testing: **Chromium only** (configurable via workflow dispatch)*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
