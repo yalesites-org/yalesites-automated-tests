@@ -35,10 +35,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          lfs: true
-
-      - name: Checkout LFS objects
-        run: git lfs pull
+          lfs: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
