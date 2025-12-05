@@ -8,7 +8,8 @@ export const DEFAULT_AXE_TAGS = [
 
 export const DEFAULT_VIS_REG_OPTIONS = {
   fullPage: true,
-  maxDiffPixelRatio: 0.17
+  maxDiffPixelRatio: 0.17,
+  animations: "disabled"
 };
 
 export const COMPONENT_TEST_BASE_URL = "/component-pages-for-e2e-testing";
@@ -28,5 +29,8 @@ export const TIMEOUTS = {
  */
 export async function setupComponentPage(page: any, componentPath: string) {
   await page.goto(`${COMPONENT_TEST_BASE_URL}/${componentPath}`);
-  await page.waitForLoadState("load");
+  await page.waitForLoadState("networkidle");
+
+  // Wait for fonts to be ready to prevent text reflow
+  await page.evaluate(() => document.fonts.ready);
 }
