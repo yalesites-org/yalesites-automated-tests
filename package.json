@@ -8,13 +8,23 @@
     "ui": "playwright test --ui",
     "debug": "playwright test --debug",
     "dev": "playwright test --reporter line",
-    "update-snapshots": "playwright test --update-snapshots"
+    "update-snapshots": "playwright test --grep 'should match previous screenshot' --update-snapshots",
+    "vis-reg": "playwright test --grep 'should match previous screenshot'",
+    "vis-reg:json": "playwright test --grep 'should match previous screenshot' --reporter=json",
+    "vis-reg:chromium": "playwright test --grep 'should match previous screenshot' --project=chromium",
+    "vis-reg:firefox": "playwright test --grep 'should match previous screenshot' --project=firefox",
+    "vis-reg:webkit": "playwright test --grep 'should match previous screenshot' --project=webkit",
+    "vis-reg:mobile": "playwright test --grep 'should match previous screenshot' --project='Mobile Safari'",
+    "update-snapshots:chromium": "playwright test --grep 'should match previous screenshot' --update-snapshots --project=chromium",
+    "update-snapshots:firefox": "playwright test --grep 'should match previous screenshot' --update-snapshots --project=firefox",
+    "update-snapshots:webkit": "playwright test --grep 'should match previous screenshot' --update-snapshots --project=webkit",
+    "update-snapshots:mobile": "playwright test --grep 'should match previous screenshot' --update-snapshots --project='Mobile Safari'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.41.2",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^20.9.0"
   },
   "dependencies": {

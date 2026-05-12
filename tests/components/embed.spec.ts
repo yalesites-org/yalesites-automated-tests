@@ -8,7 +8,7 @@ import visRegTests from "@support/visRegTests";
 let pressTabKeyRepeatedly: PressKeyForBrowserFunction;
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   pressTabKeyRepeatedly = pressKeyForBrowser(browserName, isMobile);
-  await setupComponentPage(page, "embed");
+  await setupComponentPage(page, "embed", "load");
 });
 
 test("has an iframe", async ({ page }) => {
@@ -17,4 +17,4 @@ test("has an iframe", async ({ page }) => {
 });
 
 a11yTests();
-visRegTests();
+visRegTests(undefined, undefined, ['iframe']);
