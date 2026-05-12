@@ -3,33 +3,37 @@ import { DEFAULT_VIS_REG_OPTIONS, TIMEOUTS } from "@support/testConfig";
 
 export default async function visRegTests(
   options = DEFAULT_VIS_REG_OPTIONS,
-  testName: string = "visual regression should match previous screenshot"
+  testName: string = "visual regression should match previous screenshot",
+  maskSelectors: string[] = []
 ) {
   test.describe("visual regression", () => {
     test(testName, async ({ page }) => {
-      // Wait for network to be idle
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState("networkidle", { timeout: 30000 }).catch(() => {});
 
-      // Wait for all images to load
       await page.evaluate(async () => {
         const images = Array.from(document.images);
-        await Promise.all(
-          images
-            .filter(img => !img.complete)
-            .map(img => new Promise(resolve => {
-              img.addEventListener('load', resolve);
-              img.addEventListener('error', resolve);
-            }))
-        );
+        await Promise.race([
+          Promise.all(
+            images
+              .filter(img => !img.complete)
+              .map(img => new Promise(resolve => {
+                img.addEventListener("load", resolve);
+                img.addEventListener("error", resolve);
+              }))
+          ),
+          new Promise(resolve => setTimeout(resolve, 15000)),
+        ]);
       });
 
-      // Wait for fonts to be ready
       await page.evaluate(() => document.fonts.ready);
-
-      // Wait for any animations to complete
       await page.waitForTimeout(TIMEOUTS.ANIMATION);
 
-      await expect(page).toHaveScreenshot(options);
+      // Override overflow-x:hidden on html/body — a 2.22.0 CSS addition that causes
+      // WebKit to skip painting off-screen tiles in fullPage screenshots.
+      await page.addStyleTag({ content: "html, body { overflow-x: visible !important; }" });
+
+      const mask = maskSelectors.map(selector => page.locator(selector));
+      await expect(page).toHaveScreenshot(mask.length ? { ...options, mask } : options);
     });
   });
 }

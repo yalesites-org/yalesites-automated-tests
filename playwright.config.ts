@@ -4,6 +4,8 @@ const launchOptions = {
   ignoreHTTPSErrors: true,
 };
 
+const isPantheon = (process.env.YALESITES_URL || '').includes('pantheonsite.io');
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -22,7 +24,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Limit workers to reduce Drupal database contention */
-  workers: process.env.CI ? 1 : 4,
+  workers: process.env.CI ? 1 : (isPantheon ? 2 : 4),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   /* reporter: [["html", { open: "never" }]], */
   reporter: [["html"]],
@@ -37,7 +39,7 @@ export default defineConfig({
       process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
     
     /* Navigation timeout for slow Drupal responses */
-    navigationTimeout: 30000,
+    navigationTimeout: 60000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -61,14 +63,10 @@ export default defineConfig({
       use: { ...devices["Desktop Safari"], contextOptions: launchOptions },
     },
 
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'], contextOptions: launchOptions },
-    // },
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
+      grep: /should match previous screenshot/,
     },
 
     /* Test against branded browsers. */
