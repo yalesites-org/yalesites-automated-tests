@@ -1,5 +1,13 @@
 node_modules/
 /test-results/
+/test-results.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.playwright-cli/
+
+# all-vis-reg A/B comparison baselines are regenerated from the baseline URL on
+# every run (see scripts/compareSites.sh), so they are working data, not a
+# committed reference. The per-component golden baselines under
+# snapshots/components/ ARE committed and intentionally not ignored.
+/snapshots/all-vis-reg.spec.ts-snapshots/

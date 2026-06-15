@@ -21,14 +21,17 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Limit workers to reduce Drupal database contention */
-  workers: process.env.CI ? 1 : (isPantheon ? 2 : 4),
+  /* Retry on CI; also retry against Pantheon sandboxes, which are slow to warm
+     up — a single cold-load hiccup should self-heal rather than fail the run. */
+  retries: process.env.CI ? 2 : (isPantheon ? 2 : 0),
+  /* Limit workers to reduce Drupal database contention and avoid hammering the
+     slow Pantheon sandboxes. */
+  workers: process.env.CI ? 1 : (isPantheon ? 1 : 4),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   /* reporter: [["html", { open: "never" }]], */
   reporter: [["html"]],
-  timeout: 120000,
+  /* Generous per-test budget; Pantheon sandboxes need extra time to render. */
+  timeout: isPantheon ? 180000 : 120000,
   // Change the location of snapshots so that they aren't in our test folder
   snapshotDir: "./snapshots",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -38,8 +41,8 @@ export default defineConfig({
     baseURL:
       process.env.YALESITES_URL || "http://yalesites-platform.lndo.site",
     
-    /* Navigation timeout for slow Drupal responses */
-    navigationTimeout: 60000,
+    /* Navigation timeout for slow Drupal responses; longer for cold Pantheon sandboxes. */
+    navigationTimeout: isPantheon ? 90000 : 60000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -66,7 +69,9 @@ export default defineConfig({
     {
       name: "Mobile Safari",
       use: { ...devices["iPhone 13 Mini"], contextOptions: launchOptions },
-      grep: /should match previous screenshot/,
+      // Include both the per-component visual regression tests and the
+      // all-vis-reg A/B comparison ("should compare ...") tests.
+      grep: /should match previous screenshot|should compare/,
     },
 
     /* Test against branded browsers. */
