@@ -23,7 +23,7 @@ Comprehensive end-to-end testing suite for the YaleSites Project using Playwrigh
 │   ├── features/            # Feature-level test suites
 │   │   ├── search.spec.ts
 │   │   └── link-treatments.spec.ts
-│   └── all-vis-reg.spec.ts  # Consolidated visual regression tests
+│   └── all-vis-reg.spec.ts  # Standalone two-site comparison tool (see below)
 ├── support/                 # Shared utilities and helpers
 │   ├── axePage.ts           # Custom axe-core page extensions
 │   ├── a11yTests.ts         # Accessibility testing utilities
@@ -31,20 +31,21 @@ Comprehensive end-to-end testing suite for the YaleSites Project using Playwrigh
 │   ├── testConfig.ts        # Test configuration and setup
 │   ├── tabKey.ts            # Cross-browser keyboard navigation
 │   └── ...                  # Additional utilities
-├── snapshots/               # Visual regression snapshots
+├── scripts/                 # compareSites.sh — two-site vis-reg runner
+├── snapshots/               # Visual regression baselines
 └── playwright.config.ts     # Playwright configuration
 ```
 
 ## Prerequisites
 
-- Node.js (version 16 or higher)
+- Node.js 18 or higher (required by Playwright 1.60)
 - npm
 - Access to a YaleSites instance for testing
 
 ## Installation
 
 ```bash
-gh repo clone yale-org/yalesites-automated-tests
+gh repo clone yalesites-org/yalesites-automated-tests
 cd yalesites-automated-tests
 npm install
 npx playwright install
@@ -68,9 +69,10 @@ Key configuration options in `playwright.config.ts`:
 
 - **Timeout**: 120 seconds per test
 - **Retries**: 2 attempts on failure (CI), 0 locally
-- **Workers**: 1 worker (CI), 4 workers locally
-- **Navigation Timeout**: 30 seconds for slow Drupal responses
+- **Workers**: 1 on CI, 2 when `YALESITES_URL` points at `pantheonsite.io` (avoids rate limiting), 4 otherwise
+- **Navigation Timeout**: 60 seconds for slow Drupal responses
 - **Visual Diff Threshold**: 17% maximum pixel difference for screenshots
+- **Mobile Safari**: vis-reg only — functional and accessibility tests run on the three desktop browsers
 
 ## Usage
 
@@ -92,6 +94,45 @@ YALESITES_URL="http://yalesites.domain" npm run dev
 # Update visual regression snapshots
 YALESITES_URL="http://yalesites.domain" npm run update-snapshots
 ```
+
+### Visual Regression Runs
+
+Snapshot baselines are captured from a known-good environment, then the candidate environment is
+compared against them:
+
+```bash
+# 1. Capture baselines from the known-good environment
+YALESITES_URL="https://dev-ys-yalesites-visreg-yale-edu.pantheonsite.io" npm run update-snapshots
+
+# 2. Compare the candidate environment against those baselines
+YALESITES_URL="https://v2220-ys-yalesites-visreg-yale-edu.pantheonsite.io" npm run vis-reg
+```
+
+Both have per-browser variants — use them when only one browser is failing instead of recapturing
+all four:
+
+```bash
+npm run vis-reg:chromium          # also :firefox, :webkit, :mobile
+npm run update-snapshots:webkit   # same four suffixes
+npm run vis-reg:json              # JSON reporter, for diffing runs programmatically
+```
+
+Baselines are environment-specific. A snapshot captured on Lando will not match Pantheon — capture
+and compare from the same kind of environment.
+
+### Comparing Two Live Sites
+
+Playwright's `toHaveScreenshot` can only compare against a stored baseline, not against another
+live site. `tests/all-vis-reg.spec.ts` plus `scripts/compareSites.sh` work around that by capturing
+site A as the baseline and immediately running site B against it:
+
+```bash
+./scripts/compareSites.sh https://old-site.pantheonsite.io https://new-site.pantheonsite.io
+```
+
+Failures show as plain diffs rather than in the report's comparison GUI. The component list in
+`all-vis-reg.spec.ts` is hardcoded and separate from `tests/components/`, so adding a component
+test does not add it here.
 
 ### Running Specific Tests
 
@@ -138,11 +179,28 @@ Accessibility tests use axe-core with the following default rule sets:
 - `wcag21a`, `wcag21aa` - WCAG 2.1 Level A/AA
 - `best-practice` - Axe best practices
 
+All iframes are excluded from axe analysis (in the `AxePage` wrapper) so embedded third-party
+content such as reCAPTCHA doesn't report violations this project can't fix.
+
 ### Visual Regression Testing
 
-Visual regression tests capture full-page screenshots and compare them across test runs with a maximum allowed pixel difference of 17%. Screenshots are captured for:
+Visual regression tests capture full-page screenshots and compare them against stored baselines with a maximum allowed pixel difference of 17%. Screenshots are captured for:
 - Desktop browsers (Chromium, Firefox, WebKit)
 - Mobile Safari (iPhone 13 Mini)
+
+Every vis-reg npm script selects tests with `--grep 'should match previous screenshot'`, and the
+Mobile Safari project uses the same string as its `grep`. Keep that phrase in any vis-reg test name
+— renaming past it silently drops the test from every snapshot script and leaves the mobile project
+with nothing to run.
+
+Third-party content that can't render consistently is masked out of the screenshot by passing
+selectors as the third argument, e.g. `visRegTests(undefined, undefined, ['iframe'])` in
+`tests/components/embed.spec.ts`.
+
+`visRegTests` also injects `html, body { overflow-x: visible !important; }` before capturing.
+Platform CSS added `overflow-x: hidden` in 2.22.0, which triggers a WebKit compositing bug that
+returns fullPage screenshots blank below the fold. Removing it requires re-checking Mobile Safari
+snapshots.
 
 ## Browser Support
 
@@ -157,11 +215,14 @@ Tests run across the following browser configurations:
 
 ### Key Helper Functions
 
-- `setupComponentPage(page, componentName)` - Navigate to component test pages
-- `a11yTests()` - Run standardized accessibility test suite
-- `visRegTests()` - Run visual regression test suite
-- `pressKeyForBrowser()` - Cross-browser keyboard navigation testing
-- `TIMEOUTS` - Centralized timeout configurations
+- `setupComponentPage(page, componentPath, loadState = "networkidle")` - Navigate to a component test page and wait for fonts. Pass `"load"` when a third-party iframe holds a connection open and `networkidle` would hang.
+- `a11yTests(axeTags?, testName?)` - Run the standardized accessibility test suite
+- `visRegTests(options?, testName?, maskSelectors?)` - Run the visual regression test suite
+- `pressKeyForBrowser(browserName, isMobile)` - Returns a tab-press function. WebKit and Mobile Safari need `Alt+Tab` rather than `Tab` to move through links, and each browser needs a different number of presses to reach the same element (`BROWSER_DEFAULTS` in `support/tabKey.ts`).
+- `getLoginUrl(path)` - One-time login URL via `lando drush uli` locally, or `terminus drush <site.env> -- user:login` when the path looks like `*.dev`/`*.test`/`*.live`. Local path comes from `YALESITES_PROJECT_PATH`, defaulting to `../yalesites-project`.
+- `TIMEOUTS` - Centralized timeouts: `ELEMENT_VISIBLE` 10s, `USER_INTERACTION` 5s, `NETWORK_REQUEST` 15s, `ANIMATION` 5s
+
+Helpers are imported through the `@support/*` path alias defined in `tsconfig.json`.
 
 ### Component Test Pages
 
@@ -170,10 +231,9 @@ Tests target component demonstration pages at:
 
 ## Snapshot Management
 
-Visual regression snapshots are stored in the `./snapshots` directory, organized by:
-- Test file name
-- Browser/device configuration
-- Operating system
+Visual regression baselines are stored outside the test folders, in `./snapshots`, one directory
+per spec file (`snapshots/components/[name].spec.ts-snapshots/`), with a file per browser/device and
+platform.
 
 To update snapshots after intentional visual changes:
 ```bash
@@ -185,7 +245,7 @@ npm run update-snapshots
 ### Common Issues
 
 1. **Timeout Errors**: Increase navigation timeout for slow Drupal responses
-2. **Visual Differences**: Check if changes are intentional, update snapshots if needed
+2. **Visual Differences**: A diff may be a real platform regression, not a stale baseline. Look at the diff image in `playwright-report/` before reaching for `--update-snapshots`
 3. **Accessibility Failures**: Review axe-core violations and fix underlying issues
 4. **Browser-Specific Failures**: Check for cross-browser compatibility issues
 
