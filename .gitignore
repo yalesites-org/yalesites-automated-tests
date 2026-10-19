@@ -3,3 +3,12 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Local test run output
+test-results.json
+
+# Share Claude config with the team (the global gitignore ignores these)
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!CLAUDE.md
