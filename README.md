@@ -97,8 +97,11 @@ YALESITES_URL="http://yalesites.domain" npm run update-snapshots
 
 ### Visual Regression Runs
 
-Snapshot baselines are captured from a known-good environment, then the candidate environment is
-compared against them:
+**Live A/B is the authoritative mode.** Baselines are captured from a known-good environment, then
+the candidate environment is compared against them, in the same run on the same machine. The
+snapshots committed under `snapshots/components/` are leftovers from the last local macOS capture,
+not a shared reference. See
+[Why there are no stored baselines in CI](#why-there-are-no-stored-baselines-in-ci).
 
 ```bash
 # 1. Capture baselines from the known-good environment
@@ -276,8 +279,28 @@ When adding new tests:
 
 ## CI/CD Integration
 
-The test suite is configured for CI environments with:
-- Single worker to reduce database contention
-- Automatic retries on failure
-- HTML report generation
-- Trace collection on failures
+`.github/workflows/visual-regression.yml` runs a Chromium live A/B pass on demand. It never runs on
+its own: there is no push, pull request, or schedule trigger.
+
+1. Actions → **Visual regression (A/B)** → **Run workflow**.
+2. Enter a baseline URL (known-good) and a comparison URL (candidate).
+3. The run summary shows pass/fail and how many pages failed (a visual diff or an error), with a
+   link to the Playwright HTML report artifact. Download and unzip it, then
+   `npx playwright show-report <dir>`.
+
+In CI, Playwright runs with a single worker (less load on the Pantheon database) and retries each
+failure twice.
+
+### Why there are no stored baselines in CI
+
+yalesites-org/yalesites-automated-tests#11 tried CI against the committed snapshots and was closed
+unmerged. Every committed snapshot is a macOS capture (`-darwin` suffix, none `-linux`), so a Linux
+runner cannot compare against them. Making them work would mean regenerating them in Docker and
+storing them in Git LFS, which the team ruled out because LFS storage would eventually be billed
+(recorded in yalesites-org/YaleSites-Internal#1436). Live A/B captures its baseline on the runner
+itself, so there is nothing to store, keep current, or pay for.
+Do not try the stored-baseline approach in CI again.
+
+The `snapshots/components/` files and the `update-snapshots*` scripts stay because the scripts are
+the capture half of every A/B run, locally and in CI. The committed files are leftovers from local
+macOS captures. CI never reads them.
