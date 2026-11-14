@@ -1,0 +1,87 @@
+name: Visual regression (A/B)
+
+# Manual only. No push, pull_request, or schedule trigger: per-PR automation is
+# yalesites-org/YaleSites-Internal#1326 and is deliberately deferred.
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_url:
+        description: Known-good site to capture baselines from (e.g. https://dev-ys-yalesites-visreg-yale-edu.pantheonsite.io)
+        required: true
+        type: string
+      comparison_url:
+        description: Candidate site to compare against the baseline
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  visreg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BASELINE_URL: ${{ inputs.baseline_url }}
+      COMPARISON_URL: ${{ inputs.comparison_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      # Baselines are captured fresh on this runner, so the committed macOS
+      # snapshots are never read here.
+      # A page that fails to capture should fail in the compare step, not stop the run.
+      - name: Capture baseline
+        continue-on-error: true
+        run: YALESITES_URL="$BASELINE_URL" npm run update-snapshots:chromium -- --reporter=dot
+
+      - name: Compare
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: results.json
+        run: YALESITES_URL="$COMPARISON_URL" npm run vis-reg:chromium -- --reporter=html,json
+
+      - name: Upload report
+        id: report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Summarize
+        if: always()
+        env:
+          REPORT_URL: ${{ steps.report.outputs.artifact-url }}
+        run: |
+          if [ -f results.json ]; then
+            diffs=$(jq '.stats.unexpected' results.json)
+            passed=$(jq '.stats.expected' results.json)
+            flaky=$(jq '.stats.flaky' results.json)
+            if [ "$diffs" = "0" ]; then verdict="PASS"; else verdict="FAIL"; fi
+          else
+            verdict="ERROR (comparison did not run)"; diffs="n/a"; passed="n/a"; flaky="n/a"
+          fi
+          {
+            echo "## Visual regression: $verdict"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Baseline | $BASELINE_URL |"
+            echo "| Comparison | $COMPARISON_URL |"
+            echo "| Failed pages (diff or error) | $diffs |"
+            echo "| Matching pages | $passed |"
+            echo "| Flaky (passed on retry) | $flaky |"
+            if [ -n "$REPORT_URL" ]; then
+              echo ""
+              echo "[Playwright HTML report]($REPORT_URL) (download, unzip, then \`npx playwright show-report <dir>\`)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
