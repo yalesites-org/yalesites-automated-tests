@@ -3,3 +3,10 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Local test run output
+test-results.json
+
+# Claude Code local config (may hold permission allowlists); keep CLAUDE.md tracked
+/.claude/
+!CLAUDE.md
